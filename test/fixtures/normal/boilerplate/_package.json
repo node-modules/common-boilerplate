@@ -1,19 +1,12 @@
 {
-  "name": "common-boilerplate",
-  "version": "0.0.0",
-  "description": "base class for boilerplate",
+  "name": "{{name}}",
+  "version": "1.0.0",
+  "description": "{{description}}",
   "dependencies": {
-    "common-bin": "^2.7.3",
-    "globby": "^8.0.1",
-    "inquirer": "^6.0.0",
-    "is-text-path": "^1.0.1",
-    "mz": "^2.7.0",
-    "mz-modules": "^2.1.0"
   },
   "devDependencies": {
     "autod": "^3.0.1",
-    "coffee": "^4.1.0",
-    "egg-bin": "^4.7.1",
+    "egg-bin": "^4.3.7",
     "egg-ci": "^1.8.0",
     "eslint": "^5.1.0",
     "eslint-config-egg": "^7.0.0",
@@ -34,18 +27,15 @@
   "ci": {
     "version": "6, 8"
   },
-  "eslintIgnore": [
-    "coverage",
-    "dist"
-  ],
+  "eslintIgnore": [ "coverage", "dist" ],
   "repository": {
     "type": "git",
-    "url": "git@github.com:node-modules/common-boilerplate.git"
+    "url": ""
   },
   "files": [
     "lib",
     "index.js"
   ],
-  "author": "TZ <atian25@qq.com>",
+  "author": "{{author}}",
   "license": "MIT"
 }
