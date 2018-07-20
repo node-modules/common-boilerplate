@@ -19,7 +19,7 @@ class BaseBoilerplate extends Command {
     const currentPath = this.boilerplatePaths[this.boilerplatePaths.length - 1];
     this.pkgInfo = require(path.join(currentPath, 'package.json'));
 
-    this.prompt = this.initInquirer();
+    this.prompt = this._initInquirer();
 
     this.fileMapping = {
       gitignore: '.gitignore',
@@ -146,7 +146,7 @@ class BaseBoilerplate extends Command {
    */
   * normalizeFileInfo(fileInfo, locals) {
     // convert speical file name, such as `_package.json`, `{{ name }}.test.js`
-    const filePath = this.renderTemplate(fileInfo.key, locals);
+    const filePath = yield this.renderTemplate(fileInfo.key, locals);
     fileInfo.isText = this.isTextFile(filePath);
     fileInfo.dest = path.join(this.baseDir, filePath);
     return fileInfo;
@@ -171,7 +171,7 @@ class BaseBoilerplate extends Command {
    */
   * processFile(fileInfo, locals) {
     if (fileInfo.isText) {
-      fileInfo.content = this.renderTemplate(fileInfo.content, locals);
+      fileInfo.content = yield this.renderTemplate(fileInfo.content, locals);
       if (fileInfo.key === 'package.json') {
         const pkg = yield this.updateMeta(JSON.parse(fileInfo.content));
         fileInfo.content = JSON.stringify(pkg, null, 2);
@@ -207,7 +207,7 @@ class BaseBoilerplate extends Command {
    * @param {Object} locals - variable scope
    * @return {String} new content
    */
-  renderTemplate(tpl, locals) {
+  * renderTemplate(tpl, locals) {
     return tpl.toString().replace(/(\\)?{{ *(\w+) *}}/g, (block, skip, key) => {
       if (skip) {
         return block.substring(skip.length);
@@ -250,8 +250,12 @@ class BaseBoilerplate extends Command {
     return paths;
   }
 
-  initInquirer() {
-    // create a self contained inquirer module, and trigger event
+  /**
+   * create a self contained inquirer module, and trigger event
+   * @return {Function} prompt
+   * @private
+   */
+  _initInquirer() {
     const originPrompt = inquirer.createPromptModule();
     const prompt = (questions, cb) => {
       if (!Array.isArray(questions)) questions = [].concat(questions);
