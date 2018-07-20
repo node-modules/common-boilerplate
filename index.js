@@ -19,7 +19,7 @@ class BaseBoilerplate extends Command {
     const currentPath = this.boilerplatePaths[this.boilerplatePaths.length - 1];
     this.pkgInfo = require(path.join(currentPath, 'package.json'));
 
-    this.inquirer = inquirer;
+    this.prompt = this.initInquirer();
 
     this.fileMapping = {
       gitignore: '.gitignore',
@@ -79,7 +79,7 @@ class BaseBoilerplate extends Command {
     this.baseDir = baseDir;
 
     // ask user for input
-    context.locals = yield this.prompt();
+    context.locals = yield this.askQuestions();
 
     // find all boilerplate files
     const files = yield this.listFiles();
@@ -96,10 +96,12 @@ class BaseBoilerplate extends Command {
     }
   }
 
-  * prompt() {
+  * askQuestions() {
     // TODO: get user info
     // support silent
-    return {};
+    if (!this.questions) return {};
+
+    return this.prompt(this.questions);
   }
 
   /**
@@ -246,6 +248,33 @@ class BaseBoilerplate extends Command {
     }
 
     return paths;
+  }
+
+  initInquirer() {
+    // create a self contained inquirer module, and trigger event
+    const originPrompt = inquirer.createPromptModule();
+    const prompt = (questions, cb) => {
+      if (!Array.isArray(questions)) questions = [].concat(questions);
+
+      const task = originPrompt(questions, cb);
+      let sendCount = 0;
+
+      // will trigger after each prompt result
+      task.ui.process.subscribe(() => {
+        // only auto answer if current questions list is not finish
+        if (sendCount < questions.length) {
+          process.send({ type: 'prompt' });
+          sendCount++;
+        }
+      });
+
+      // send first key
+      process.send({ type: 'prompt' });
+      sendCount++;
+
+      return task;
+    };
+    return prompt;
   }
 
   isTextFile(filePath) {

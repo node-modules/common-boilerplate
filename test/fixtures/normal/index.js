@@ -1,17 +1,13 @@
 'use strict';
 
-const path = require('path');
-const { sleep } = require('mz-modules');
 const BaseBoilerplate = require('../../../index');
 
 module.exports = class TestBoilerplate extends BaseBoilerplate {
 
-  get [Symbol.for('boilerplate#root')]() {
-    return __dirname;
-  }
+  constructor(...args) {
+    super(...args);
 
-  * prompt() {
-    const result = yield this.inquirer.prompt([
+    this.questions = [
       {
         type: 'input',
         name: 'name',
@@ -23,8 +19,10 @@ module.exports = class TestBoilerplate extends BaseBoilerplate {
         message: 'What\'s your project description:',
         default: 'default desc',
       },
-    ]);
+    ];
+  }
 
-    return result;
+  get [Symbol.for('boilerplate#root')]() {
+    return __dirname;
   }
 };

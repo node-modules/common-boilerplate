@@ -12,7 +12,7 @@ describe('test/index.test.js', () => {
   let fileCache = {};
 
   function assertFile(filePath, str) {
-    filePath = path.join(cwd,filePath);
+    filePath = path.join(cwd, filePath);
     if (!fileCache[filePath]) {
       fileCache[filePath] = fs.readFileSync(filePath, 'utf-8');
     }
@@ -37,17 +37,17 @@ describe('test/index.test.js', () => {
   it('should work', function* () {
     yield fork(path.join(__dirname, 'fixtures/normal/bin/cli.js'), [ ], { cwd })
       .debug()
-      .mockPrompt('example')
-      .mockPrompt('this is a desc')
+      .prompt('example')
+      .prompt('this is a desc')
       .end();
   });
 
   it('should test-utils', function* () {
     yield fork(path.join(__dirname, 'fixtures/test-utils/bin/cli.js'), [ ], { cwd })
       .debug()
-      .mockPrompt('example')
-      .mockPrompt('this is a desc')
-      .mockPrompt(KEYS.DOWN + KEYS.DOWN + KEYS.UP)
+      .prompt('example')
+      .prompt('this is a desc')
+      .prompt(KEYS.DOWN + KEYS.DOWN + KEYS.UP)
       .end();
 
     assertFile('README.md', 'name = example');

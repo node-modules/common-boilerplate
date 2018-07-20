@@ -9,10 +9,10 @@ module.exports = class TestBoilerplate extends BaseBoilerplate {
     return __dirname;
   }
 
-  * prompt() {
-    const result = {};
+  * askQuestions() {
+    const result = yield super.askQuestions();
 
-    const answer1 = yield this.inquirer.prompt([
+    const answer1 = yield this.prompt([
       {
         type: 'input',
         name: 'name',
@@ -25,12 +25,11 @@ module.exports = class TestBoilerplate extends BaseBoilerplate {
         default: 'default desc',
       },
     ]);
-    Object.assign(this.context.argv, result);
 
     // simulation anther prompt after a long task
     yield sleep('1s');
 
-    const answer2 = yield this.inquirer.prompt([
+    const answer2 = yield this.prompt([
       {
         type: 'list',
         name: 'type',
@@ -39,6 +38,9 @@ module.exports = class TestBoilerplate extends BaseBoilerplate {
       },
     ]);
 
-    return Object.assign(result, answer1, answer2);
+    Object.assign(result, answer1, answer2);
+
+    console.log(result);
+    return result;
   }
 };
