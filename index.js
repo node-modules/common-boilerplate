@@ -68,7 +68,7 @@ class BaseBoilerplate extends Command {
   patchContext(context) {
     const { argv, cwd } = context;
     /* istanbul ignore next */
-    argv.baseDir = argv.baseDir || cwd;
+    argv.baseDir = argv.baseDir || argv._[0] || cwd;
     /* istanbul ignore next */
     if (!path.isAbsolute(argv.baseDir)) argv.baseDir = path.join(cwd, argv.baseDir);
 
@@ -243,3 +243,5 @@ class BaseBoilerplate extends Command {
 }
 
 module.exports = BaseBoilerplate;
+
+module.exports.testUtils = require('./lib/test_utils');

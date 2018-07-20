@@ -2,7 +2,7 @@
 
 const path = require('path');
 const { rimraf, mkdirp } = require('mz-modules');
-const { fork, KEYS } = require('./utils');
+const { fork, KEYS } = require('../').testUtils;
 
 describe('test/index.test.js', () => {
   const cwd = path.join(__dirname, '.tmp');
