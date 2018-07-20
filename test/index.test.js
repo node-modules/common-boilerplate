@@ -2,7 +2,7 @@
 
 const path = require('path');
 const { rimraf, mkdirp } = require('mz-modules');
-const coffee = require('coffee');
+const { fork, KEYS } = require('./utils');
 
 describe('test/index.test.js', () => {
   const cwd = path.join(__dirname, '.tmp');
@@ -17,13 +17,11 @@ describe('test/index.test.js', () => {
   });
 
   it('should work', function* () {
-    const cli = path.join(__dirname, 'fixtures/normal/bin/cli.js');
-    yield coffee.fork(cli, [ ], { cwd })
+    yield fork(path.join(__dirname, 'fixtures/normal/bin/cli.js'), [ ], { cwd })
       .debug()
-      .write('example\n')
-      // .write('this is an example boilerplate\n')
-      // .expect('stdout', /"urllib": "\d+.\d+.\d+/)
-      // .expect('code', 0)
+      .mockPrompt('example')
+      .mockPrompt('this is a desc')
+      .mockPrompt(KEYS.DOWN + KEYS.DOWN + KEYS.UP)
       .end();
   });
 });
