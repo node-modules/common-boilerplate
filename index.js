@@ -66,29 +66,30 @@ class BaseBoilerplate extends Command {
   }
 
   patchContext(context) {
-    const { argv, cwd } = context;
-    /* istanbul ignore next */
-    argv.baseDir = argv.baseDir || argv._[0] || cwd;
-    /* istanbul ignore next */
-    if (!path.isAbsolute(argv.baseDir)) argv.baseDir = path.join(cwd, argv.baseDir);
-
     // merge from package.json and ~/.eggrc
     return context;
   }
 
-  * run() {
+  * run(context) {
+    const { argv, cwd } = context;
+    /* istanbul ignore next */
+    let baseDir = argv.baseDir || argv._[0] || cwd;
+    /* istanbul ignore next */
+    if (!path.isAbsolute(baseDir)) baseDir = path.join(cwd, baseDir);
+    this.baseDir = baseDir;
+
     // ask user for input
-    yield this.prompt();
+    context.locals = yield this.prompt();
 
     // find all boilerplate files
     const files = yield this.listFiles();
 
     for (const key of Object.keys(files)) {
       const fileInfo = files[key];
-      yield this.normalizeFileInfo(fileInfo);
+      yield this.normalizeFileInfo(fileInfo, context.locals);
       yield this.loadFile(fileInfo);
       // process file, such as template render or replace string @ali/mm
-      yield this.processFile(fileInfo);
+      yield this.processFile(fileInfo, context.locals);
       // save files to disk
       yield this.saveFile(fileInfo);
       // console.log(fileInfo);
@@ -98,6 +99,7 @@ class BaseBoilerplate extends Command {
   * prompt() {
     // TODO: get user info
     // support silent
+    return {};
   }
 
   /**
@@ -119,9 +121,11 @@ class BaseBoilerplate extends Command {
       const root = path.join(p, 'boilerplate');
       const files = yield globby('**/*', { cwd: root, dot: true, nodir: true });
       for (const file of files) {
+        // convert speical file name, such as `_package.json`
+        const key = this.fileMapping[file] || file;
         // will override
-        result[file] = {
-          key: file,
+        result[key] = {
+          key,
           src: path.join(root, file),
         };
       }
@@ -131,16 +135,18 @@ class BaseBoilerplate extends Command {
 
   /**
    * normalize fileInfo
-   *  - `fileInfo.dest`: convert speical file name, such as `_package.json`, `{{ name }}.test.js`
+   *  - `fileInfo.dest`: convert speical file name, such as `{{ name }}.test.js`
+   *  - `fileInfo.isText`
    *
    * @param {FileInfo} fileInfo - file info
+   * @param {Object} locals - scope locals
    * @return {FileInfo} new file info
    */
-  * normalizeFileInfo(fileInfo) {
+  * normalizeFileInfo(fileInfo, locals) {
     // convert speical file name, such as `_package.json`, `{{ name }}.test.js`
-    const { key } = fileInfo;
-    const filePath = this.renderTemplate(this.fileMapping[key] || key, this.context.argv);
-    fileInfo.dest = path.join(this.context.argv.baseDir, filePath);
+    const filePath = this.renderTemplate(fileInfo.key, locals);
+    fileInfo.isText = this.isTextFile(filePath);
+    fileInfo.dest = path.join(this.baseDir, filePath);
     return fileInfo;
   }
 
@@ -156,14 +162,15 @@ class BaseBoilerplate extends Command {
 
   /**
    * do what you want to process file, such as render template
+   *
    * @param {FileInfo} fileInfo - file info
+   * @param {Object} locals - scope locals
    * @return {FileInfo} new file info
    */
-  * processFile(fileInfo) {
-    const fileName = this.fileMapping[fileInfo.key];
-    if (isTextPath(fileInfo.dest) || fileName) {
-      fileInfo.content = this.renderTemplate(fileInfo.content, this.context.argv);
-      if (fileName === 'package.json') {
+  * processFile(fileInfo, locals) {
+    if (fileInfo.isText) {
+      fileInfo.content = this.renderTemplate(fileInfo.content, locals);
+      if (fileInfo.key === 'package.json') {
         const pkg = yield this.updateMeta(JSON.parse(fileInfo.content));
         fileInfo.content = JSON.stringify(pkg, null, 2);
       }
@@ -239,6 +246,10 @@ class BaseBoilerplate extends Command {
     }
 
     return paths;
+  }
+
+  isTextFile(filePath) {
+    return isTextPath(filePath) || path.basename(filePath).startsWith('.');
   }
 }
 
