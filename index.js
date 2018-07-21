@@ -85,11 +85,10 @@ class BaseBoilerplate extends Command {
     const files = yield this.listFiles();
 
     for (const key of Object.keys(files)) {
-      const fileInfo = files[key];
-      yield this.normalizeFileInfo(fileInfo, context.locals);
+      const fileInfo = yield this.normalizeFileInfo(files[key], context);
       yield this.loadFile(fileInfo);
       // process file, such as template render or replace string @ali/mm
-      yield this.processFile(fileInfo, context.locals);
+      yield this.processFile(fileInfo, context);
       // save files to disk
       yield this.saveFile(fileInfo);
       // console.log(fileInfo);
@@ -107,9 +106,11 @@ class BaseBoilerplate extends Command {
   /**
    * @typedef FileInfo
    * @type {Object}
-   * @property {String} key
-   * @property {String} src
-   * @property {String} dest
+   * @property {String} key - file name
+   * @property {String} src - source template full path
+   * @property {String} dest - target path
+   * @property {Boolean} isText - whether file type is textfile
+   * @property {String|Buffer} content - file content
    */
 
 
@@ -141,12 +142,12 @@ class BaseBoilerplate extends Command {
    *  - `fileInfo.isText`
    *
    * @param {FileInfo} fileInfo - file info
-   * @param {Object} locals - scope locals
+   * @param {Object} context - context info
    * @return {FileInfo} new file info
    */
-  * normalizeFileInfo(fileInfo, locals) {
+  * normalizeFileInfo(fileInfo, context) {
     // convert speical file name, such as `_package.json`, `{{ name }}.test.js`
-    const filePath = yield this.renderTemplate(fileInfo.key, locals);
+    const filePath = yield this.renderTemplate(fileInfo.key, context.locals);
     fileInfo.isText = this.isTextFile(filePath);
     fileInfo.dest = path.join(this.baseDir, filePath);
     return fileInfo;
@@ -166,14 +167,15 @@ class BaseBoilerplate extends Command {
    * do what you want to process file, such as render template
    *
    * @param {FileInfo} fileInfo - file info
-   * @param {Object} locals - scope locals
+   * @param {Object} context - context info
    * @return {FileInfo} new file info
    */
-  * processFile(fileInfo, locals) {
-    if (fileInfo.isText) {
-      fileInfo.content = yield this.renderTemplate(fileInfo.content, locals);
-      if (fileInfo.key === 'package.json') {
-        const pkg = yield this.updateMeta(JSON.parse(fileInfo.content));
+  * processFile(fileInfo, context) {
+    const { key, isText, content } = fileInfo;
+    if (isText) {
+      fileInfo.content = yield this.renderTemplate(content, context.locals);
+      if (key === 'package.json') {
+        const pkg = yield this.updateMeta(JSON.parse(content));
         fileInfo.content = JSON.stringify(pkg, null, 2);
       }
     }
