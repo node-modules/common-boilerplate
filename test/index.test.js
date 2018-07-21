@@ -5,7 +5,7 @@ const assert = require('assert');
 const is = require('is-type-of');
 const { fs } = require('mz');
 const { rimraf, mkdirp } = require('mz-modules');
-const { fork, KEYS } = require('../').testUtils;
+const { fork, KEYS } = require('./utils');
 
 describe('test/index.test.js', () => {
   const cwd = path.join(__dirname, '.tmp');

@@ -91,7 +91,6 @@ class BaseBoilerplate extends Command {
       yield this.processFile(fileInfo, context);
       // save files to disk
       yield this.saveFile(fileInfo);
-      // console.log(fileInfo);
     }
   }
 
@@ -147,9 +146,9 @@ class BaseBoilerplate extends Command {
    */
   * normalizeFileInfo(fileInfo, context) {
     // convert speical file name, such as `_package.json`, `{{ name }}.test.js`
-    const filePath = yield this.renderTemplate(fileInfo.key, context.locals);
-    fileInfo.isText = this.isTextFile(filePath);
-    fileInfo.dest = path.join(this.baseDir, filePath);
+    const fileName = yield this.renderTemplate(fileInfo.key, context.locals);
+    fileInfo.isText = this.isTextFile(fileName);
+    fileInfo.dest = path.join(this.baseDir, fileName);
     return fileInfo;
   }
 
@@ -283,11 +282,9 @@ class BaseBoilerplate extends Command {
     return prompt;
   }
 
-  isTextFile(filePath) {
-    return isTextPath(filePath) || path.basename(filePath).startsWith('.');
+  isTextFile(fileName) {
+    return isTextPath(fileName) || path.basename(fileName).startsWith('.');
   }
 }
 
 module.exports = BaseBoilerplate;
-
-module.exports.testUtils = require('./lib/test_utils');
