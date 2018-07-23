@@ -5,22 +5,32 @@ const assert = require('assert');
 const is = require('is-type-of');
 const { fs } = require('mz');
 const { rimraf, mkdirp } = require('mz-modules');
-const { fork, KEYS } = require('./utils');
+const coffee = require('./utils');
+const KEYS = coffee.KEYS;
 
 describe('test/index.test.js', () => {
   const cwd = path.join(__dirname, '.tmp');
   let fileCache = {};
 
-  function assertFile(filePath, str) {
+  function getFile(filePath) {
     filePath = path.join(cwd, filePath);
     if (!fileCache[filePath]) {
       fileCache[filePath] = fs.readFileSync(filePath, 'utf-8');
     }
-    const content = fileCache[filePath];
+    return fileCache[filePath];
+  }
+
+  function checkFileExists(filePath, exists) {
+    exists = exists !== false;
+    filePath = path.join(cwd, filePath);
+    assert(fs.existsSync(filePath) === exists);
+  }
+
+  function assertFile(filePath, str) {
     if (is.string(str)) {
-      assert(content.includes(str));
+      assert(getFile(filePath).includes(str));
     } else {
-      assert(content.match(str));
+      assert(getFile(filePath).match(str));
     }
   }
 
@@ -35,25 +45,65 @@ describe('test/index.test.js', () => {
   });
 
   it('should work', async () => {
-    await fork(path.join(__dirname, 'fixtures/normal/bin/cli.js'), [ ], { cwd })
+    await coffee.fork(path.join(__dirname, 'fixtures/normal/bin/cli.js'), [ ], { cwd })
       // .debug()
       .waitForPrompt()
       .write('example\n')
       .write('this is a desc\n')
+      .write(KEYS.DOWN + KEYS.DOWN + KEYS.UP + '\n')
       .end();
+
+    const pkg = JSON.parse(getFile('package.json'));
+    assert(pkg.boilerplate.name === 'normal');
+    assert(pkg.boilerplate.version === '1.0.0');
+
+    assertFile('README.md', 'name = example');
+    assertFile('README.md', 'description = this is a desc');
+    assertFile('README.md', 'type = plugin');
+    assertFile('README.md', 'empty = {{ empty }}');
+    assertFile('README.md', 'escapse = {{ name }}');
+
+    checkFileExists('test/example.test.js');
+    checkFileExists('.gitignore');
+    checkFileExists('.eslintrc');
+    checkFileExists('github.png');
   });
 
   it('should boilerplate for boilerplate', async () => {
-    await fork(path.join(__dirname, 'fixtures/boilerplate-boilerplate/bin/cli.js'), [ ], { cwd })
-      // .debug()
+    await coffee.fork(path.join(__dirname, 'fixtures/boilerplate-boilerplate/bin/cli.js'), [ ], { cwd })
+      .debug()
       .waitForPrompt()
       .write('example\n')
       .write('this is a desc\n')
       .end();
   });
 
+  it('should support multi-level boilerplate', async () => {
+    await coffee.fork(path.join(__dirname, 'fixtures/multi-level/bin/cli.js'), [ ], { cwd })
+      // .debug()
+      .waitForPrompt()
+      .write('example\n')
+      .write('this is a desc\n')
+      .write(KEYS.DOWN + KEYS.DOWN + '\n')
+      .write('ANOTHER\n')
+      .end();
+
+    const pkg = JSON.parse(getFile('package.json'));
+    assert(pkg.boilerplate.name === 'multi-level');
+    assert(pkg.boilerplate.version === '1.0.0');
+
+    // override file
+    assertFile('README.md', 'name = example');
+    assertFile('README.md', 'another = ANOTHER');
+    checkFileExists('test/example.test.js');
+    // new file
+    checkFileExists('index.json');
+    // remove file
+    checkFileExists('github.png', false);
+  });
+
   it('should support mutli prompt', async () => {
-    await fork(path.join(__dirname, 'fixtures/mutli-prompt/bin/cli.js'), [ ], { cwd })
+    await coffee.fork(path.join(__dirname, 'fixtures/mutli-prompt/bin/cli.js'), [ ], { cwd })
       // .debug()
       .waitForPrompt()
       .write('example\n')

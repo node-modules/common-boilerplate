@@ -19,6 +19,12 @@ module.exports = class TestBoilerplate extends BaseBoilerplate {
         message: 'What\'s your project description:',
         default: 'default desc',
       },
+      {
+        type: 'list',
+        name: 'type',
+        message: 'choose your type:',
+        choices: [ 'simple', 'plugin', 'framework' ],
+      },
     ];
   }
 

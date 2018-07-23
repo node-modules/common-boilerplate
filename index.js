@@ -93,7 +93,10 @@ class BaseBoilerplate extends Command {
     const files = await this.listFiles();
 
     for (const key of Object.keys(files)) {
-      const fileInfo = await this.normalizeFileInfo(files[key], context);
+      const filePath = files[key];
+      if (!filePath) continue;
+
+      const fileInfo = await this.normalizeFileInfo(filePath, context);
       await this.loadFile(fileInfo);
       // process file, such as template render or replace string @ali/mm
       await this.processFile(fileInfo, context);
@@ -106,6 +109,13 @@ class BaseBoilerplate extends Command {
     // TODO: get user info
     // support silent
     if (!this.questions) return {};
+
+    // for (const name of Object.keys(this.questions)) {
+    //   const item = this.questions[name];
+    //   if (item.silent) {
+    //     this.locals[name] = item.default;
+    //   }
+    // }
 
     return this.prompt(this.questions);
   }
@@ -179,6 +189,8 @@ class BaseBoilerplate extends Command {
    */
   async processFile(fileInfo, context) {
     const { key, isText, content } = fileInfo;
+    // TODO: log progress
+    // console.log(fileInfo.dest, isText);
     if (isText) {
       fileInfo.content = await this.renderTemplate(content, context.locals);
       if (key === 'package.json') {
@@ -202,6 +214,7 @@ class BaseBoilerplate extends Command {
    * @param {FileInfo} fileInfo - file info
    */
   async saveFile(fileInfo) {
+    // console.log(`${fileInfo.src} -> ${fileInfo.dest}`);
     await mkdirp(path.dirname(fileInfo.dest));
     await fs.writeFile(fileInfo.dest, fileInfo.content);
   }
@@ -251,6 +264,7 @@ class BaseBoilerplate extends Command {
       assert(rootPath && typeof rootPath === 'string', `Symbol.for('${KEY}') should be string`);
       assert(fs.existsSync(rootPath), `${rootPath} not exists`);
       const realpath = fs.realpathSync(rootPath);
+      /* istanbul ignore else */
       if (!paths.includes(realpath)) {
         paths.unshift(realpath);
       }

@@ -8,4 +8,5 @@ run/
 *.swp
 .vscode
 .tmp
+test/.tmp
 

@@ -11,19 +11,21 @@ module.exports = class TestBoilerplate extends BaseBoilerplate {
       eslint_config: 'eslint-config-egg',
     };
 
-    this.questions = [
-      {
-        type: 'input',
-        name: 'name',
-        message: 'What\'s your project name:',
-      },
-      {
-        type: 'input',
-        name: 'description',
-        message: 'What\'s your project description:',
-        default: 'default desc',
-      },
-    ];
+    // this.questions = {
+    //   name: {
+    //     type: 'input',
+    //     name: 'name',
+    //     message: 'What\'s your project name:',
+    //     default: 'egg',
+    //     when: false,
+    //   },
+    //   description: {
+    //     type: 'input',
+    //     name: 'description',
+    //     message: 'What\'s your project description:',
+    //     default: 'default desc',
+    //   },
+    // };
   }
 
   get [Symbol.for('boilerplate#root')]() {
