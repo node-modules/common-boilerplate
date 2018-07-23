@@ -18,6 +18,7 @@ class BaseBoilerplate extends Command {
     this.boilerplatePaths = this._getBoilerplatePaths();
     const currentPath = this.boilerplatePaths[this.boilerplatePaths.length - 1];
     this.pkgInfo = require(path.join(currentPath, 'package.json'));
+    this.locals = {};
 
     this.prompt = this._initInquirer();
 
@@ -66,11 +67,17 @@ class BaseBoilerplate extends Command {
   }
 
   patchContext(context) {
+    const self = this;
     // merge from package.json and ~/.eggrc
+    Object.defineProperty(context, 'locals', {
+      configurable: true,
+      enumerable: true,
+      get() { return self.locals; },
+    });
     return context;
   }
 
-  * run(context) {
+  async run(context) {
     const { argv, cwd } = context;
     /* istanbul ignore next */
     let baseDir = argv.baseDir || argv._[0] || cwd;
@@ -79,22 +86,23 @@ class BaseBoilerplate extends Command {
     this.baseDir = baseDir;
 
     // ask user for input
-    context.locals = yield this.askQuestions();
+    const answers = await this.askQuestions();
+    this.locals = Object.assign(this.locals, answers);
 
     // find all boilerplate files
-    const files = yield this.listFiles();
+    const files = await this.listFiles();
 
     for (const key of Object.keys(files)) {
-      const fileInfo = yield this.normalizeFileInfo(files[key], context);
-      yield this.loadFile(fileInfo);
+      const fileInfo = await this.normalizeFileInfo(files[key], context);
+      await this.loadFile(fileInfo);
       // process file, such as template render or replace string @ali/mm
-      yield this.processFile(fileInfo, context);
+      await this.processFile(fileInfo, context);
       // save files to disk
-      yield this.saveFile(fileInfo);
+      await this.saveFile(fileInfo);
     }
   }
 
-  * askQuestions() {
+  async askQuestions() {
     // TODO: get user info
     // support silent
     if (!this.questions) return {};
@@ -117,11 +125,11 @@ class BaseBoilerplate extends Command {
    * find all boilerplate files from prototype chain
    * @return {Object<string, FileInfo>} all boilerplate files
    */
-  * listFiles() {
+  async listFiles() {
     const result = {};
     for (const p of this.boilerplatePaths) {
       const root = path.join(p, 'boilerplate');
-      const files = yield globby('**/*', { cwd: root, dot: true, nodir: true });
+      const files = await globby('**/*', { cwd: root, dot: true, nodir: true });
       for (const file of files) {
         // convert speical file name, such as `_package.json`
         const key = this.fileMapping[file] || file;
@@ -144,9 +152,9 @@ class BaseBoilerplate extends Command {
    * @param {Object} context - context info
    * @return {FileInfo} new file info
    */
-  * normalizeFileInfo(fileInfo, context) {
+  async normalizeFileInfo(fileInfo, context) {
     // convert speical file name, such as `_package.json`, `{{ name }}.test.js`
-    const fileName = yield this.renderTemplate(fileInfo.key, context.locals);
+    const fileName = await this.renderTemplate(fileInfo.key, context.locals);
     fileInfo.isText = this.isTextFile(fileName);
     fileInfo.dest = path.join(this.baseDir, fileName);
     return fileInfo;
@@ -157,8 +165,8 @@ class BaseBoilerplate extends Command {
    * @param {FileInfo} fileInfo - file info
    * @return {FileInfo} new file info
    */
-  * loadFile(fileInfo) {
-    fileInfo.content = yield fs.readFile(fileInfo.src);
+  async loadFile(fileInfo) {
+    fileInfo.content = await fs.readFile(fileInfo.src);
     return fileInfo;
   }
 
@@ -169,19 +177,19 @@ class BaseBoilerplate extends Command {
    * @param {Object} context - context info
    * @return {FileInfo} new file info
    */
-  * processFile(fileInfo, context) {
+  async processFile(fileInfo, context) {
     const { key, isText, content } = fileInfo;
     if (isText) {
-      fileInfo.content = yield this.renderTemplate(content, context.locals);
+      fileInfo.content = await this.renderTemplate(content, context.locals);
       if (key === 'package.json') {
-        const pkg = yield this.updateMeta(JSON.parse(content));
+        const pkg = await this.updateMeta(JSON.parse(content));
         fileInfo.content = JSON.stringify(pkg, null, 2);
       }
     }
     return fileInfo;
   }
 
-  * updateMeta(pkg) {
+  async updateMeta(pkg) {
     pkg.boilerplate = {
       name: this.pkgInfo.name,
       version: this.pkgInfo.version,
@@ -193,9 +201,9 @@ class BaseBoilerplate extends Command {
    * save file to `fileInfo.dest`
    * @param {FileInfo} fileInfo - file info
    */
-  * saveFile(fileInfo) {
-    yield mkdirp(path.dirname(fileInfo.dest));
-    yield fs.writeFile(fileInfo.dest, fileInfo.content);
+  async saveFile(fileInfo) {
+    await mkdirp(path.dirname(fileInfo.dest));
+    await fs.writeFile(fileInfo.dest, fileInfo.content);
   }
 
   /**
@@ -208,7 +216,7 @@ class BaseBoilerplate extends Command {
    * @param {Object} locals - variable scope
    * @return {String} new content
    */
-  * renderTemplate(tpl, locals) {
+  async renderTemplate(tpl, locals) {
     return tpl.toString().replace(/(\\)?{{ *(\w+) *}}/g, (block, skip, key) => {
       if (skip) {
         return block.substring(skip.length);

@@ -9,10 +9,10 @@ module.exports = class TestBoilerplate extends BaseBoilerplate {
     return __dirname;
   }
 
-  * askQuestions() {
-    const result = yield super.askQuestions();
+  async askQuestions() {
+    const result = await super.askQuestions();
 
-    const answer1 = yield this.prompt([
+    const answer1 = await this.prompt([
       {
         type: 'input',
         name: 'name',
@@ -27,9 +27,9 @@ module.exports = class TestBoilerplate extends BaseBoilerplate {
     ]);
 
     // simulation anther prompt after a long task
-    yield sleep('1s');
+    await sleep('1s');
 
-    const answer2 = yield this.prompt([
+    const answer2 = await this.prompt([
       {
         type: 'list',
         name: 'type',

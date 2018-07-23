@@ -24,34 +24,47 @@ describe('test/index.test.js', () => {
     }
   }
 
-  beforeEach(function* () {
-    yield rimraf(cwd);
-    yield mkdirp(cwd);
+  beforeEach(async () => {
+    await rimraf(cwd);
+    await mkdirp(cwd);
   });
 
-  afterEach(function* () {
-    // yield rimraf(cwd);
+  afterEach(async () => {
+    // await rimraf(cwd);
     fileCache = {};
   });
 
-  it('should work', function* () {
-    yield fork(path.join(__dirname, 'fixtures/normal/bin/cli.js'), [ ], { cwd })
-      .debug()
-      .prompt('example')
-      .prompt('this is a desc')
+  it('should work', async () => {
+    await fork(path.join(__dirname, 'fixtures/normal/bin/cli.js'), [ ], { cwd })
+      // .debug()
+      .waitForPrompt()
+      .write('example\n')
+      .write('this is a desc\n')
       .end();
   });
 
-  it('should test-utils', function* () {
-    yield fork(path.join(__dirname, 'fixtures/test-utils/bin/cli.js'), [ ], { cwd })
-      .debug()
-      .prompt('example')
-      .prompt('this is a desc')
-      .prompt(KEYS.DOWN + KEYS.DOWN + KEYS.UP)
+  it('should boilerplate for boilerplate', async () => {
+    await fork(path.join(__dirname, 'fixtures/boilerplate-boilerplate/bin/cli.js'), [ ], { cwd })
+      // .debug()
+      .waitForPrompt()
+      .write('example\n')
+      .write('this is a desc\n')
+      .end();
+  });
+
+  it('should support mutli prompt', async () => {
+    await fork(path.join(__dirname, 'fixtures/mutli-prompt/bin/cli.js'), [ ], { cwd })
+      // .debug()
+      .waitForPrompt()
+      .write('example\n')
+      .write('this is a desc\n')
+      .write(KEYS.DOWN + KEYS.DOWN + KEYS.UP + '\n')
       .end();
 
     assertFile('README.md', 'name = example');
     assertFile('README.md', 'description = this is a desc');
     assertFile('README.md', 'type = plugin');
+    assertFile('README.md', 'empty = {{ empty }}');
+    assertFile('README.md', 'escapse = {{ name }}');
   });
 });

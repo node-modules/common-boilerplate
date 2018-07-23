@@ -4,28 +4,32 @@ const Coffee = require('coffee').Coffee;
 
 // https://github.com/popomore/coffee
 class CliCoffee extends Coffee {
-  constructor(...args) {
-    super(...args);
-    this.prompts = [];
-  }
-
-  prompt(input) {
-    this.prompts.push(input);
+  waitForPrompt(bool) {
+    this._isWaitForPrompt = bool !== false;
     return this;
   }
 
   _run() {
+    if (this._isWaitForPrompt) {
+      this.prompts = this.stdin;
+      this.stdin = [];
+    }
     const res = super._run();
-    this.proc.on('message', ({ type }) => {
+    this.stdin = this.prompts;
+    this.prompts = undefined;
+    const cmd = this.proc;
+    cmd.on('message', ({ type }) => {
       if (type !== 'prompt') return;
-      const key = this.prompts.shift();
-      this.proc.stdin.write(key + '\n');
+      const key = this.stdin.shift();
+      cmd.stdin.write(key);
+      if (this.stdin.length === 0) cmd.stdin.end();
     });
     return res;
   }
 
   restore() {
     this.prompts = [];
+    this._isWaitForPrompt = false;
     return super.restore();
   }
 }
