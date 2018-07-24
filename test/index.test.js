@@ -46,16 +46,20 @@ describe('test/index.test.js', () => {
 
   it('should work', async () => {
     await coffee.fork(path.join(__dirname, 'fixtures/normal/bin/cli.js'), [ ], { cwd })
-      // .debug()
+      .debug()
       .waitForPrompt()
       .write('example\n')
       .write('this is a desc\n')
+      .write('\n')
+      .write('\n')
       .write(KEYS.DOWN + KEYS.DOWN + KEYS.UP + '\n')
       .end();
 
     const pkg = JSON.parse(getFile('package.json'));
     assert(pkg.boilerplate.name === 'normal');
     assert(pkg.boilerplate.version === '1.0.0');
+    assert(pkg.name === 'example');
+    assert(pkg.description === 'this is a desc');
 
     assertFile('README.md', 'name = example');
     assertFile('README.md', 'description = this is a desc');
@@ -70,22 +74,14 @@ describe('test/index.test.js', () => {
     checkFileExists('github.png');
   });
 
-  it.skip('should boilerplate for boilerplate', async () => {
-    await coffee.fork(path.join(__dirname, 'fixtures/boilerplate-boilerplate/bin/cli.js'), [ ], { cwd })
+  it('should support multi-level boilerplate', async () => {
+    await coffee.fork(path.join(__dirname, 'fixtures/multi-level/bin/cli.js'), [ ], { cwd })
       .debug()
       .waitForPrompt()
       .write('example\n')
       .write('this is a desc\n')
-      .expect('code', 0)
-      .end();
-  });
-
-  it('should support multi-level boilerplate', async () => {
-    await coffee.fork(path.join(__dirname, 'fixtures/multi-level/bin/cli.js'), [ ], { cwd })
-      // .debug()
-      .waitForPrompt()
-      .write('example\n')
-      .write('this is a desc\n')
+      .write('\n')
+      .write('\n')
       .write(KEYS.DOWN + KEYS.DOWN + '\n')
       .write('ANOTHER\n')
       .expect('code', 0)
@@ -94,6 +90,7 @@ describe('test/index.test.js', () => {
     const pkg = JSON.parse(getFile('package.json'));
     assert(pkg.boilerplate.name === 'multi-level');
     assert(pkg.boilerplate.version === '1.0.0');
+    assert(pkg.author === 'egg');
 
     // override file
     assertFile('README.md', 'name = example');
@@ -110,7 +107,7 @@ describe('test/index.test.js', () => {
 
   it('should support mutli prompt', async () => {
     await coffee.fork(path.join(__dirname, 'fixtures/mutli-prompt/bin/cli.js'), [ ], { cwd })
-      // .debug()
+      .debug()
       .waitForPrompt()
       .write('example\n')
       .write('this is a desc\n')

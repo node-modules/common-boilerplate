@@ -19,7 +19,7 @@ class CliCoffee extends Coffee {
     this.prompts = undefined;
     const cmd = this.proc;
     cmd.on('message', ({ type }) => {
-      if (type !== 'prompt') return;
+      if (type !== 'prompt' || this.stdin.length === 0) return;
       const key = this.stdin.shift();
       cmd.stdin.write(key);
       if (this.stdin.length === 0) cmd.stdin.end();

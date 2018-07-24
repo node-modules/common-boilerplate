@@ -8,8 +8,10 @@ const globby = require('globby');
 const { fs } = require('mz');
 const { mkdirp } = require('mz-modules');
 const inquirer = require('inquirer');
+const debug = require('debug')('boilerplate:base');
 const CONTEXT = Symbol('context');
 const KEY = 'boilerplate#root';
+const helper = require('./lib/helper');
 
 class BaseBoilerplate extends Command {
   constructor(rawArgv) {
@@ -18,9 +20,11 @@ class BaseBoilerplate extends Command {
     this.boilerplatePaths = this._getBoilerplatePaths();
     const currentPath = this.boilerplatePaths[this.boilerplatePaths.length - 1];
     this.pkgInfo = require(path.join(currentPath, 'package.json'));
+
     this.locals = {};
 
     this.prompt = this._initInquirer();
+    this.questions = this._initQuestions();
 
     this.fileMapping = {
       gitignore: '.gitignore',
@@ -34,6 +38,8 @@ class BaseBoilerplate extends Command {
 
     // it's a setter
     this.options = this.initOptions();
+
+    Object.assign(this.helper, helper);
 
     this.parserOptions = {
       execArgv: true,
@@ -86,8 +92,10 @@ class BaseBoilerplate extends Command {
 
   async run(context) {
     // ask user for input
-    const answers = await this.askQuestions();
-    this.locals = Object.assign(this.locals, answers);
+    await this.prepareLocals();
+    await this.askQuestions();
+
+    debug('[boilerplate] locals: %j', this.locals);
 
     // find all boilerplate files
     const files = await this.listFiles();
@@ -105,19 +113,20 @@ class BaseBoilerplate extends Command {
     }
   }
 
+  async prepareLocals() {
+    // TODO: node version, npm cli, npm registry, version, license
+    this.locals.repository = await this.helper.getShellResult('git config remote.origin.url');
+    this.locals.user = await this.helper.getShellResult('git config user.name');
+    this.locals.email = await this.helper.getShellResult('git config user.email');
+    return this.locals;
+  }
+
   async askQuestions() {
-    // TODO: get user info
     // support silent
-    if (!this.questions) return {};
+    if (!this.questions.length) return;
 
-    // for (const name of Object.keys(this.questions)) {
-    //   const item = this.questions[name];
-    //   if (item.silent) {
-    //     this.locals[name] = item.default;
-    //   }
-    // }
-
-    return this.prompt(this.questions);
+    const answers = await this.prompt(this.questions);
+    Object.assign(this.locals, answers);
   }
 
   /**
@@ -188,13 +197,13 @@ class BaseBoilerplate extends Command {
    * @param {FileInfo[]} args.files - files list
    */
   async processFile({ fileInfo, context }) {
-    const { key, isText, content } = fileInfo;
+    const { key, isText } = fileInfo;
     // TODO: log progress
     // console.log(fileInfo.dest, isText);
     if (isText) {
-      fileInfo.content = await this.renderTemplate(content, context.locals);
+      fileInfo.content = await this.renderTemplate(fileInfo.content, context.locals);
       if (key === 'package.json') {
-        const pkg = await this.updateMeta(JSON.parse(content));
+        const pkg = await this.updateMeta(JSON.parse(fileInfo.content));
         fileInfo.content = JSON.stringify(pkg, null, 2);
       }
     }
@@ -277,34 +286,57 @@ class BaseBoilerplate extends Command {
   }
 
   /**
-   * create a self contained inquirer module, and trigger event
+   * create a self contained inquirer module, and emit event
    * @return {Function} prompt
    * @private
    */
   _initInquirer() {
-    const originPrompt = inquirer.createPromptModule();
-    const prompt = (questions, cb) => {
-      if (!Array.isArray(questions)) questions = [].concat(questions);
-
-      const task = originPrompt(questions, cb);
-      let sendCount = 0;
-
-      // will trigger after each prompt result
-      task.ui.process.subscribe(() => {
-        // only auto answer if current questions list is not finish
-        if (sendCount < questions.length) {
-          process.send({ type: 'prompt' });
-          sendCount++;
+    // create a self contained inquirer module.
+    const promptInstance = inquirer.createPromptModule();
+    const promptMapping = promptInstance.prompts;
+    for (const key of Object.keys(promptMapping)) {
+      const Clz = promptMapping[key];
+      // extend origin prompt instance to emit event
+      promptMapping[key] = class CustomPrompt extends Clz {
+        static get name() { return Clz.name; }
+        run() {
+          process.send({ type: 'prompt', name: this.opt.name });
+          return super.run();
         }
-      });
+      };
+    }
+    return promptInstance;
+  }
 
-      // send first key
-      process.send({ type: 'prompt' });
-      sendCount++;
-
-      return task;
-    };
-    return prompt;
+  _initQuestions() {
+    return [
+      {
+        name: 'name',
+        type: 'input',
+        message: 'Project Name: ',
+        validate: v => !!v,
+      },
+      {
+        name: 'description',
+        type: 'input',
+        message: 'Description:',
+      },
+      {
+        name: 'repository',
+        type: 'input',
+        message: 'Repository:',
+        default: async () => {
+          // read from git config
+          return this.helper.getShellResult('git config remote.origin.url');
+        },
+      },
+      {
+        name: 'author',
+        type: 'input',
+        message: 'Author:',
+        default: () => `${this.locals.user} <${this.locals.email}>`,
+      },
+    ];
   }
 
   isTextFile(fileName) {

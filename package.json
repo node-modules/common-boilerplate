@@ -1,9 +1,10 @@
 {
   "name": "common-boilerplate",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "base class for boilerplate",
   "dependencies": {
     "common-bin": "^2.7.3",
+    "debug": "^3.1.0",
     "globby": "^8.0.1",
     "inquirer": "^6.0.0",
     "is-text-path": "^1.0.1",

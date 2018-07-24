@@ -10,13 +10,16 @@ module.exports = class TestBoilerplate extends BaseBoilerplate {
   }
 
   async askQuestions() {
-    const result = await super.askQuestions();
-
     const answer1 = await this.prompt([
       {
         type: 'input',
         name: 'name',
         message: 'What\'s your project name:',
+        default: async () => {
+          // test for emit event
+          await sleep(100);
+          return 'test_default';
+        },
       },
       {
         type: 'input',
@@ -41,9 +44,6 @@ module.exports = class TestBoilerplate extends BaseBoilerplate {
       }
     );
 
-    Object.assign(result, answer1, answer2);
-
-    // console.log(result);
-    return result;
+    Object.assign(this.locals, answer1, answer2);
   }
 };

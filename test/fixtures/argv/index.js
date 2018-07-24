@@ -8,6 +8,8 @@ module.exports = class TestBoilerplate extends BaseBoilerplate {
     return __dirname;
   }
 
+  _initQuestions() { return []; }
+
   async run(context) {
     const { locals, argv } = context;
     locals.baseDir = argv.baseDir;

@@ -14,6 +14,10 @@ module.exports = class TestBoilerplate extends BaseBoilerplate {
         message: 'Another question:',
       }
     );
+
+    // change parent question
+    const q = this.questions.filter(x => x.name === 'author')[0];
+    q.default = 'egg';
   }
 
   get [Symbol.for('boilerplate#root')]() {
