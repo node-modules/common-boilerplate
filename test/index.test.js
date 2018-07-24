@@ -62,6 +62,7 @@ describe('test/index.test.js', () => {
     assertFile('README.md', 'type = plugin');
     assertFile('README.md', 'empty = {{ empty }}');
     assertFile('README.md', 'escapse = {{ name }}');
+    assertFile('test/example.test.js', 'const mock = require(\'egg-mock\');');
 
     checkFileExists('test/example.test.js');
     checkFileExists('.gitignore');
@@ -69,12 +70,13 @@ describe('test/index.test.js', () => {
     checkFileExists('github.png');
   });
 
-  it('should boilerplate for boilerplate', async () => {
+  it.skip('should boilerplate for boilerplate', async () => {
     await coffee.fork(path.join(__dirname, 'fixtures/boilerplate-boilerplate/bin/cli.js'), [ ], { cwd })
       .debug()
       .waitForPrompt()
       .write('example\n')
       .write('this is a desc\n')
+      .expect('code', 0)
       .end();
   });
 
@@ -86,6 +88,7 @@ describe('test/index.test.js', () => {
       .write('this is a desc\n')
       .write(KEYS.DOWN + KEYS.DOWN + '\n')
       .write('ANOTHER\n')
+      .expect('code', 0)
       .end();
 
     const pkg = JSON.parse(getFile('package.json'));
@@ -95,7 +98,10 @@ describe('test/index.test.js', () => {
     // override file
     assertFile('README.md', 'name = example');
     assertFile('README.md', 'another = ANOTHER');
+
     checkFileExists('test/example.test.js');
+    assertFile('test/example.test.js', 'const mock = require(\'@ali/mm\');');
+
     // new file
     checkFileExists('index.json');
     // remove file
@@ -109,6 +115,7 @@ describe('test/index.test.js', () => {
       .write('example\n')
       .write('this is a desc\n')
       .write(KEYS.DOWN + KEYS.DOWN + KEYS.UP + '\n')
+      .expect('code', 0)
       .end();
 
     assertFile('README.md', 'name = example');
@@ -116,5 +123,32 @@ describe('test/index.test.js', () => {
     assertFile('README.md', 'type = plugin');
     assertFile('README.md', 'empty = {{ empty }}');
     assertFile('README.md', 'escapse = {{ name }}');
+  });
+
+  describe('argv', () => {
+    it('--baseDir', async () => {
+      await coffee.fork(path.join(__dirname, 'fixtures/argv/bin/cli.js'), [ '--baseDir', '.tmp' ], { cwd: path.dirname(cwd) })
+        // .debug()
+        .expect('stdout', /one context: true/)
+        .end();
+
+      assertFile('README.md', `baseDir = ${cwd}`);
+    });
+
+    it('--baseDir absolute', async () => {
+      await coffee.fork(path.join(__dirname, 'fixtures/argv/bin/cli.js'), [ '--baseDir', cwd ], { cwd: path.dirname(cwd) })
+        // .debug()
+        .end();
+
+      assertFile('README.md', `baseDir = ${cwd}`);
+    });
+
+    it('argv._[0]', async () => {
+      await coffee.fork(path.join(__dirname, 'fixtures/argv/bin/cli.js'), [ cwd ])
+        // .debug()
+        .end();
+
+      assertFile('README.md', `baseDir = ${cwd}`);
+    });
   });
 });

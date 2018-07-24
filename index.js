@@ -67,8 +67,15 @@ class BaseBoilerplate extends Command {
   }
 
   patchContext(context) {
+    // TODO: merge from package.json and ~/.eggrc
+    const { argv, cwd } = context;
     const self = this;
-    // merge from package.json and ~/.eggrc
+
+    let baseDir = argv.baseDir || argv._[0] || cwd;
+    if (!path.isAbsolute(baseDir)) baseDir = path.join(cwd, baseDir);
+    argv.baseDir = baseDir;
+
+    // define context.locals -> this.locals
     Object.defineProperty(context, 'locals', {
       configurable: true,
       enumerable: true,
@@ -78,13 +85,6 @@ class BaseBoilerplate extends Command {
   }
 
   async run(context) {
-    const { argv, cwd } = context;
-    /* istanbul ignore next */
-    let baseDir = argv.baseDir || argv._[0] || cwd;
-    /* istanbul ignore next */
-    if (!path.isAbsolute(baseDir)) baseDir = path.join(cwd, baseDir);
-    this.baseDir = baseDir;
-
     // ask user for input
     const answers = await this.askQuestions();
     this.locals = Object.assign(this.locals, answers);
@@ -93,15 +93,15 @@ class BaseBoilerplate extends Command {
     const files = await this.listFiles();
 
     for (const key of Object.keys(files)) {
-      const filePath = files[key];
-      if (!filePath) continue;
+      const fileInfo = files[key];
+      if (!fileInfo) continue;
 
-      const fileInfo = await this.normalizeFileInfo(filePath, context);
-      await this.loadFile(fileInfo);
+      await this.normalizeFileInfo({ fileInfo, context });
+      await this.loadFile({ fileInfo });
       // process file, such as template render or replace string @ali/mm
-      await this.processFile(fileInfo, context);
+      await this.processFile({ fileInfo, context, files });
       // save files to disk
-      await this.saveFile(fileInfo);
+      await this.saveFile({ fileInfo, context, files });
     }
   }
 
@@ -158,36 +158,36 @@ class BaseBoilerplate extends Command {
    *  - `fileInfo.dest`: convert speical file name, such as `{{ name }}.test.js`
    *  - `fileInfo.isText`
    *
-   * @param {FileInfo} fileInfo - file info
-   * @param {Object} context - context info
-   * @return {FileInfo} new file info
+   * @param {Object} args - args
+   * @param {FileInfo} args.fileInfo - file info
+   * @param {Object} args.context - context info
    */
-  async normalizeFileInfo(fileInfo, context) {
+  async normalizeFileInfo({ fileInfo, context }) {
     // convert speical file name, such as `_package.json`, `{{ name }}.test.js`
     const fileName = await this.renderTemplate(fileInfo.key, context.locals);
     fileInfo.isText = this.isTextFile(fileName);
-    fileInfo.dest = path.join(this.baseDir, fileName);
-    return fileInfo;
+    fileInfo.dest = path.join(context.argv.baseDir, fileName);
   }
 
   /**
    * load file content to `fileInfo.content`
-   * @param {FileInfo} fileInfo - file info
-   * @return {FileInfo} new file info
+   *
+   * @param {Object} args - args
+   * @param {FileInfo} args.fileInfo - file info
    */
-  async loadFile(fileInfo) {
+  async loadFile({ fileInfo }) {
     fileInfo.content = await fs.readFile(fileInfo.src);
-    return fileInfo;
   }
 
   /**
    * do what you want to process file, such as render template
    *
-   * @param {FileInfo} fileInfo - file info
-   * @param {Object} context - context info
-   * @return {FileInfo} new file info
+   * @param {Object} args - args
+   * @param {FileInfo} args.fileInfo - file info
+   * @param {Object} args.context - context info
+   * @param {FileInfo[]} args.files - files list
    */
-  async processFile(fileInfo, context) {
+  async processFile({ fileInfo, context }) {
     const { key, isText, content } = fileInfo;
     // TODO: log progress
     // console.log(fileInfo.dest, isText);
@@ -198,7 +198,6 @@ class BaseBoilerplate extends Command {
         fileInfo.content = JSON.stringify(pkg, null, 2);
       }
     }
-    return fileInfo;
   }
 
   async updateMeta(pkg) {
@@ -211,9 +210,13 @@ class BaseBoilerplate extends Command {
 
   /**
    * save file to `fileInfo.dest`
+   *
+   * @param {FileInfo} args.fileInfo - file info
+   * @param {Object} args.context - context info
+   * @param {FileInfo[]} args.files - files list
    * @param {FileInfo} fileInfo - file info
    */
-  async saveFile(fileInfo) {
+  async saveFile({ fileInfo }) {
     // console.log(`${fileInfo.src} -> ${fileInfo.dest}`);
     await mkdirp(path.dirname(fileInfo.dest));
     await fs.writeFile(fileInfo.dest, fileInfo.content);
