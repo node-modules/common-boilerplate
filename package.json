@@ -1,10 +1,11 @@
 {
   "name": "common-boilerplate",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "base class for boilerplate",
   "dependencies": {
     "common-bin": "^2.7.3",
     "debug": "^3.1.0",
+    "git-url-parse": "^10.0.1",
     "globby": "^8.0.1",
     "inquirer": "^6.0.0",
     "is-text-path": "^1.0.1",
@@ -17,7 +18,7 @@
     "coffee": "^4.1.0",
     "egg-bin": "^4.7.1",
     "egg-ci": "^1.8.0",
-    "eslint": "^5.1.0",
+    "eslint": "^5.2.0",
     "eslint-config-egg": "^7.0.0",
     "is-type-of": "^1.2.0",
     "webstorm-disable-index": "^1.2.0"

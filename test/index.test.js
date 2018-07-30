@@ -125,7 +125,7 @@ describe('test/index.test.js', () => {
   describe('argv', () => {
     it('--baseDir', async () => {
       await coffee.fork(path.join(__dirname, 'fixtures/argv/bin/cli.js'), [ '--baseDir', '.tmp' ], { cwd: path.dirname(cwd) })
-        // .debug()
+        .debug()
         .expect('stdout', /one context: true/)
         .end();
 
@@ -134,7 +134,7 @@ describe('test/index.test.js', () => {
 
     it('--baseDir absolute', async () => {
       await coffee.fork(path.join(__dirname, 'fixtures/argv/bin/cli.js'), [ '--baseDir', cwd ], { cwd: path.dirname(cwd) })
-        // .debug()
+        .debug()
         .end();
 
       assertFile('README.md', `baseDir = ${cwd}`);
@@ -142,7 +142,7 @@ describe('test/index.test.js', () => {
 
     it('argv._[0]', async () => {
       await coffee.fork(path.join(__dirname, 'fixtures/argv/bin/cli.js'), [ cwd ])
-        // .debug()
+        .debug()
         .end();
 
       assertFile('README.md', `baseDir = ${cwd}`);
