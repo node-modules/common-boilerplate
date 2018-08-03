@@ -5,8 +5,8 @@ const assert = require('assert');
 const is = require('is-type-of');
 const { fs } = require('mz');
 const { rimraf, mkdirp } = require('mz-modules');
-const coffee = require('./utils');
-const KEYS = coffee.KEYS;
+const coffee = require('coffee');
+const KEYS = require('./utils').KEYS;
 
 describe('test/index.test.js', () => {
   const cwd = path.join(__dirname, '.tmp');
