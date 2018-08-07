@@ -9,7 +9,7 @@ describe.only('test/test-utils.test.js', () => {
     return testUtils.run('test-utils')
       .expectFile('README.md', /# README/)
       .notExpectFile('no-exist')
-      // .expectFile('index.json', { child: { name: 'tz' } })
+      .expectFile('index.json', { child: { name: 'tz' } })
       .expectJSON('index.json', { child: { name: 'tz' } })
       .notExpectJSON('index.json', { child: { name: 'no-exist' } })
       .expect('code', 0)
