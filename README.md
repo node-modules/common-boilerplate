@@ -25,5 +25,83 @@ base class for boilerplate
 ## Usage
 
 ```bash
-npm i common-boilerplate --save
+$ npm i common-boilerplate --save
+```
+
+## Write your boilerplate
+
+use [boilerplate-boilerplate](https://github.com/node-modules/boilerplate-boilerplate) for quick start.
+
+```bash
+$ npm i boilerplate-boilerplate
+$ node ./node_modules/boilerplate-boilerplate/bin/cli.js
+```
+
+### Directory
+
+```bash
+├── bin
+│   └── cli.js
+├── boilerplate
+│   ├── bin
+│   ├── lib
+│   ├── test
+│   ├── README.md
+│   ├── _.eslintrc
+│   ├── _.gitignore
+│   ├── _package.json
+│   └── index.js
+├── test
+│   └── index.test.js
+├── index.js
+├── README.md
+└── package.json
+```
+
+### Ask questions
+
+### Template Render
+
+## Unit Testing
+
+Extends [Coffee](https://github.com/node-modules/coffee) to provide testUtils for cli
+
+```js
+const testUtils = require('common-boilerplate').testUtils;
+
+describe('test/index.test.js', () => {
+  it('should work', () => {
+    return testUtils.run()
+      // .debug()
+      .waitForPrompt()
+      // answer to the questions
+      .write('example\n')
+      // emit `DOWN` key to select the second choise
+      .choose(2)
+
+      // expect README.md to be exists
+      .expectFile('README.md')
+
+      // check with `includes`
+      .expectFile('README.md', 'this is a desc')
+
+      // check with regex
+      .expectFile('README.md', /desc/)
+
+      // check whether contains
+      .expectFile('package.json', { name: 'example' })
+
+      // opposite assertion
+      .notExpectFile('not-exist')
+      .notExpectFile('README.md', 'sth')
+
+      // see others at `coffee` docs
+      .expect('stdout', /some console message/)
+      .expect('stderr', /some error message/)
+      .expect('code', 0)
+
+      // don't forgot to call `end()`
+      .end();
+  });
+});
 ```
