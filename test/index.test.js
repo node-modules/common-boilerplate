@@ -2,7 +2,6 @@
 
 const path = require('path');
 const testUtils = require('..').testUtils;
-
 describe('test/index.test.js', () => {
 
   it('should work', () => {
@@ -22,7 +21,7 @@ describe('test/index.test.js', () => {
       .expectFile('.gitignore')
       .expectFile('.eslintrc')
       .expectFile('github.png')
-      .expectJSON('package.json', {
+      .expectFile('package.json', {
         name: 'example',
         description: 'this is a desc',
         boilerplate: {
@@ -53,7 +52,7 @@ describe('test/index.test.js', () => {
       .expectFile('index.json')
       // remove file
       .notExpectFile('github.png')
-      .expectJSON('package.json', {
+      .expectFile('package.json', {
         name: 'example',
         description: 'this is a desc',
         author: 'egg',
