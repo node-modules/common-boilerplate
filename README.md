@@ -69,10 +69,15 @@ const Boilerplate = require('common-boilerplate');
 
 class TestBoilerplate extends Boilerplate {
 
-  constructor(...args) {
-    super(...args);
+  // must provide your directory
+  get [Symbol.for('boilerplate#root')]() {
+    return __dirname;
+  }
 
-    this.questions.push(
+  initQuestions() {
+    const questions = super.initQuestions();
+
+    questions.push(
       {
         type: 'list',
         name: 'type',
@@ -80,11 +85,7 @@ class TestBoilerplate extends Boilerplate {
         choices: [ 'simple', 'plugin', 'framework' ],
       }
     );
-  }
-
-  // must provide your directory
-  get [Symbol.for('boilerplate#root')]() {
-    return __dirname;
+    return questions
   }
 };
 
@@ -100,10 +101,10 @@ Add your questions:
 
 ```js
 class TestBoilerplate extends Boilerplate {
-  constructor(...args) {
-    super(...args);
+  initQuestions() {
+    const questions = super.initQuestions();
 
-    this.questions.push(
+    questions.push(
       {
         type: 'list',
         name: 'type',
@@ -111,16 +112,9 @@ class TestBoilerplate extends Boilerplate {
         choices: [ 'simple', 'plugin', 'framework' ],
       }
     );
+    return questions
   }
   // ...
-};
-```
-
-Ignore built-in questions:
-
-```js
-class TestBoilerplate extends Boilerplate {
-  initQuestions() { return []; }
 };
 ```
 
@@ -151,7 +145,13 @@ Built-in render is very simple:
 
 - `this.locals` will be use to fill the teamplte
   - come from user's prompt answer
-  - and result from `async initLocals()`
+  - built-in locals:
+    - `repository` - read from git remote url
+    - `org` - read from git remote url
+    - `name` - read from git remote url
+    - `user` - read from git user name
+    - `email` - read from git user email
+    - `author` - `${user} <${email}>`
 - Rule:
   - `{{ test }}` will replace
   - `\{{ test }}` will skip
@@ -170,6 +170,13 @@ nunjucks.configure({ autoescape: false });
 class TestBoilerplate extends Boilerplate {
   async renderTemplate(tpl, locals) {
     return nunjucks.renderString(tpl, locals);
+  }
+
+  // custom your locals
+  async initLocals() {
+    const locals = await super.initLocals();
+    locals.foo = 'bar';
+    return locals;
   }
 };
 ```
@@ -205,9 +212,15 @@ class TestBoilerplate extends Boilerplate {
   get [Symbol.for('boilerplate#root')]() {
     return __dirname;
   }
+
+  // example for ignore some files from parent
+  async listFiles() {
+    const files = await super.listFiles();
+    files['github.png'] = undefined;
+    return files;
+  }
 };
 module.exports = TestBoilerplate;
-// don't forgot to exports `testUtils`
 module.exports.testUtils = Boilerplate.testUtils;
 ```
 

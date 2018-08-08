@@ -4,24 +4,24 @@ const BaseBoilerplate = require('../normal');
 
 module.exports = class TestBoilerplate extends BaseBoilerplate {
 
-  constructor(...args) {
-    super(...args);
-
-    this.questions.push(
-      {
-        type: 'input',
-        name: 'another',
-        message: 'Another question:',
-      }
-    );
-
-    // change parent question
-    const q = this.questions.filter(x => x.name === 'author')[0];
-    q.default = 'egg';
-  }
-
   get [Symbol.for('boilerplate#root')]() {
     return __dirname;
+  }
+
+  initQuestions() {
+    const questions = super.initQuestions();
+
+    // change parent question
+    const q = questions.filter(x => x.name === 'author')[0];
+    q.default = 'egg';
+
+    questions.push({
+      type: 'input',
+      name: 'another',
+      message: 'Another question:',
+    });
+
+    return questions;
   }
 
   async listFiles() {

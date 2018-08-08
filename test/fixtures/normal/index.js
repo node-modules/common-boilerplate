@@ -4,22 +4,43 @@ const BaseBoilerplate = require('../../../index');
 
 class TestBoilerplate extends BaseBoilerplate {
 
-  constructor(...args) {
-    super(...args);
+  get [Symbol.for('boilerplate#root')]() {
+    return __dirname;
+  }
 
-    this.questions.push(
+  initQuestions() {
+    return [
+      {
+        name: 'name',
+        type: 'input',
+        message: 'Project Name: ',
+        default: () => this.locals.name,
+      },
+      {
+        name: 'description',
+        type: 'input',
+        message: 'Description:',
+      },
+      {
+        name: 'repository',
+        type: 'input',
+        message: 'Repository:',
+        default: () => this.locals.repository,
+      },
+      {
+        name: 'author',
+        type: 'input',
+        message: 'Author:',
+        default: () => `${this.locals.user} <${this.locals.email}>`,
+      },
       {
         type: 'list',
         name: 'type',
         message: 'choose your type:',
         choices: [ 'simple', 'plugin', 'framework' ],
-      }
-    );
+      },
+    ];
   }
-
-  get [Symbol.for('boilerplate#root')]() {
-    return __dirname;
-  }
-};
+}
 
 module.exports = TestBoilerplate;

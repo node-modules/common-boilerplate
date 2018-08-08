@@ -6,6 +6,7 @@ describe('test/index.test.js', () => {
 
   it('should work', () => {
     return testUtils.run('normal')
+      // .debug()
       .waitForPrompt()
       .write('example\n')
       .write('this is a desc\n')
@@ -35,6 +36,7 @@ describe('test/index.test.js', () => {
 
   it('should support multi-level boilerplate', () => {
     return testUtils.run('multi-level')
+      // .debug()
       .waitForPrompt()
       .write('example\n')
       .write('this is a desc\n')
