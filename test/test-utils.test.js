@@ -3,6 +3,8 @@
 const testUtils = require('..').testUtils;
 const assert = require('assert');
 const path = require('path');
+const fs = require('fs');
+const { rimraf, sleep } = require('mz-modules');
 require('assert-extends');
 
 describe('test/test-utils.test.js', () => {
@@ -54,7 +56,7 @@ describe('test/test-utils.test.js', () => {
         .expectFile('index.json', { child: { name: 'no-exists' } })
         .expect('code', 1)
         .end();
-    }, /index.json` should match rule `{"child":{"name":"no-exists"}}\(Object\)` with content `{"name"/);
+    }, /index.json` should contains `{"child":{"name":"no-exists"}}\(Object\)` with content `{"name"/);
   });
 
   it('should expectFile with JSON fail when no-exist', async () => {
@@ -104,7 +106,7 @@ describe('test/test-utils.test.js', () => {
         .notExpectFile('index.json', { name: 'test' })
         .expect('code', 1)
         .end();
-    }, /index.json` should not match rule `{"name":"test"}\(Object\)` with content `{"name":"test"/);
+    }, /index.json` should not contains `{"name":"test"}\(Object\)` with content `{"name":"test"/);
   });
 
   it('should notExpectFile fail with JSON when no-exist', async () => {
@@ -115,5 +117,33 @@ describe('test/test-utils.test.js', () => {
         .expect('code', 1)
         .end();
     }, /no-exist` should exists before check opposite rule `{"name":"test"}\(Object\)`/);
+  });
+
+  it('should not clean when debug()', async () => {
+    await testUtils.run('test-utils')
+      .debug()
+      .expect('code', 0)
+      .end();
+
+    try {
+      assert(fs.existsSync(path.join(__dirname, '.tmp/README.md')));
+    } finally {
+      await rimraf(path.join(__dirname, '.tmp'));
+    }
+  });
+
+  it('should kill', async () => {
+    const cli = testUtils.run('normal');
+
+    await sleep(100);
+
+    assert(cli.proc.connected);
+
+    cli.close();
+
+    await sleep(1000);
+
+    assert(!cli.proc.connected);
+    assert(!fs.existsSync(path.join(__dirname, '.tmp')));
   });
 });
