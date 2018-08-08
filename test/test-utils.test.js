@@ -40,7 +40,7 @@ describe('test/test-utils.test.js', () => {
     }, /README.md` should match rule `\/nth\/\(RegExp\)` with content `# README/);
   });
 
-  it('should expectFile with String fail', async () => {
+  it('should expectFile fail with string ', async () => {
     return assert.asyncThrows(() => {
       return testUtils.run('test-utils')
         .expectFile('README.md', 'abc')
@@ -49,7 +49,7 @@ describe('test/test-utils.test.js', () => {
     }, /README.md` should includes `abc\(String\)` with content `# README/);
   });
 
-  it('should expectFile with JSON fail', async () => {
+  it('should expectFile fail with JSON ', async () => {
     return assert.asyncThrows(() => {
       return testUtils.run('test-utils')
         // .debug()
@@ -59,7 +59,7 @@ describe('test/test-utils.test.js', () => {
     }, /index.json` should contains `{"child":{"name":"no-exists"}}\(Object\)` with content `{"name"/);
   });
 
-  it('should expectFile with JSON fail when no-exist', async () => {
+  it('should expectFile fail with JSON when no-exist', async () => {
     return assert.asyncThrows(() => {
       return testUtils.run('test-utils')
         // .debug()
