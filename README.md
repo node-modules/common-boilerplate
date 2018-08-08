@@ -58,13 +58,166 @@ $ node ./node_modules/boilerplate-boilerplate/bin/cli.js
 └── package.json
 ```
 
+- `index.js` is your Boilerplate Logic, the main entry.
+- `boilerplate/**` is your template dir, will be copy to dest.
+
+### Boilerplate Entry
+
+```js
+// index.js
+const Boilerplate = require('common-boilerplate');
+
+class TestBoilerplate extends Boilerplate {
+
+  constructor(...args) {
+    super(...args);
+
+    this.questions.push(
+      {
+        type: 'list',
+        name: 'type',
+        message: 'choose your type:',
+        choices: [ 'simple', 'plugin', 'framework' ],
+      }
+    );
+  }
+
+  // must provide your directory
+  get [Symbol.for('boilerplate#root')]() {
+    return __dirname;
+  }
+};
+
+module.exports = TestBoilerplate;
+module.exports.testUtils = Boilerplate.testUtils;
+```
+
 ### Ask questions
+
+[Inquirer](https://github.com/SBoudrias/Inquirer.js) is built-in to provide `prompt` helper.
+
+Add your questions:
+
+```js
+class TestBoilerplate extends Boilerplate {
+  constructor(...args) {
+    super(...args);
+
+    this.questions.push(
+      {
+        type: 'list',
+        name: 'type',
+        message: 'choose your type:',
+        choices: [ 'simple', 'plugin', 'framework' ],
+      }
+    );
+  }
+  // ...
+};
+```
+
+Ignore built-in questions:
+
+```js
+class TestBoilerplate extends Boilerplate {
+  initQuestions() { return []; }
+};
+```
+
+`Prompt` as your wish:
+
+```js
+class TestBoilerplate extends Boilerplate {
+  async askQuestions() {
+    // DO NOT use `Inquirer` directly
+    // just use `this.prompt` which will emit event for unit testing
+    const answer = await this.prompt([
+      {
+        type: 'input',
+        name: 'name',
+        message: 'What\'s your project name:',
+      },
+    ]);
+
+    // should write to `this.locals`
+    Object.assign(this.locals, answer);
+  }
+};
+```
 
 ### Template Render
 
+Built-in render is very simple:
+
+- `this.locals` will be use to fill the teamplte
+  - come from user's prompt answer
+  - and result from `async initLocals()`
+- Rule:
+  - `{{ test }}` will replace
+  - `\{{ test }}` will skip
+  - not support `{{ obj.test }}`
+  - unknown variable will left as what it is
+
+Custom your render logic:
+
+```js
+// recommended to use https://github.com/mozilla/nunjucks
+const nunjucks = require('nunjucks');
+
+// could disable auto escape
+nunjucks.configure({ autoescape: false });
+
+class TestBoilerplate extends Boilerplate {
+  async renderTemplate(tpl, locals) {
+    return nunjucks.renderString(tpl, locals);
+  }
+};
+```
+
+### File Name Convert
+
+- also use template render, so `{{name}}.test.js` is supported.
+- some file is special, so you can't use it's origin name
+  - such as `boilerplate/package.json`, npm will read `files` and ignore your files.
+  - use `_` as prefix, such as `_package.json` / `_.gitignore` / `_.eslintrc`
+  - add your mapping by `this.fileMapping`
+
+### Boilerplate Chain
+
+Support mutli-level boilerplate, so you can share logic between boilerplates.
+
+```js
+class ShareBoilerplate extends Boilerplate {
+  // must provide your directory
+  get [Symbol.for('boilerplate#root')]() {
+    return __dirname;
+  }
+};
+module.exports = ShareBoilerplate;
+// don't forgot to exports `testUtils`
+module.exports.testUtils = Boilerplate.testUtils;
+```
+
+```js
+// child
+class TestBoilerplate extends Boilerplate {
+  // must provide your directory
+  get [Symbol.for('boilerplate#root')]() {
+    return __dirname;
+  }
+};
+module.exports = TestBoilerplate;
+// don't forgot to exports `testUtils`
+module.exports.testUtils = Boilerplate.testUtils;
+```
+
+- must provide getter `Symbol.for('boilerplate#root')` to announce your root, and `boilerplate` directory is required to exists at your root directory.
+- will auto load all files from boilerplate, same key will be override.
+- you could custom by `async listFiles()`, such as ignore some files from parent.
+
 ## Unit Testing
 
-Extends [Coffee](https://github.com/node-modules/coffee) to provide testUtils for cli
+Extends [Coffee](https://github.com/node-modules/coffee) to provide testUtils for cli.
 
 ```js
 const testUtils = require('common-boilerplate').testUtils;

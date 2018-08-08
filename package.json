@@ -1,6 +1,6 @@
 {
   "name": "common-boilerplate",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "base class for boilerplate",
   "dependencies": {
     "coffee": "^5.0.1",
