@@ -2,7 +2,7 @@
 
 const BaseBoilerplate = require('../../../index');
 
-module.exports = class TestBoilerplate extends BaseBoilerplate {
+class TestBoilerplate extends BaseBoilerplate {
 
   constructor(...args) {
     super(...args);
@@ -21,3 +21,5 @@ module.exports = class TestBoilerplate extends BaseBoilerplate {
     return __dirname;
   }
 };
+
+module.exports = TestBoilerplate;
