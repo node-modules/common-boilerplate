@@ -90,7 +90,6 @@ describe('test/index.test.js', () => {
     it('--baseDir', () => {
       const options = {
         baseDir: 'argv',
-        // clean: false,
         args: [ '--baseDir', '.tmp' ],
         opt: {
           cwd: __dirname,
@@ -108,7 +107,6 @@ describe('test/index.test.js', () => {
     it('--baseDir absolute', () => {
       const options = {
         baseDir: 'argv',
-        // clean: false,
         args: [ '--baseDir', cwd ],
         opt: {
           cwd: path.dirname(cwd),
@@ -126,7 +124,6 @@ describe('test/index.test.js', () => {
     it('argv._[0]', () => {
       const options = {
         baseDir: 'argv',
-        // clean: false,
         args: [ cwd ],
       };
       return testUtils.run(options)
