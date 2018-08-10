@@ -24,8 +24,8 @@ module.exports = class TestBoilerplate extends BaseBoilerplate {
     return questions;
   }
 
-  async listFiles() {
-    const files = await super.listFiles();
+  async listFiles(...args) {
+    const files = await super.listFiles(...args);
     files['github.png'] = undefined;
     return files;
   }

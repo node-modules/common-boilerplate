@@ -8,6 +8,7 @@ require('assert-extends');
 describe('test/test-utils.test.js', () => {
   it('should work', () => {
     return testUtils.run('test-utils')
+      // .debug()
       .expectFile('README.md', '# README')
       .expectFile('README.md', /# README/)
       .expectFile(path.join(__dirname, '.tmp/README.md'))
@@ -25,6 +26,18 @@ describe('test/test-utils.test.js', () => {
       baseDir: path.join(__dirname, 'fixtures/test-utils'),
     })
       .expectFile('README.md', '# README')
+      .expect('code', 0)
+      .end();
+  });
+
+  it('should warn when write too much', () => {
+    return testUtils.run({
+      baseDir: path.join(__dirname, 'fixtures/test-utils'),
+    })
+      .debug()
+      .write('\n')
+      .expectFile('README.md', '# README')
+      // .expect('stdout', /stdin is not empty, write\(\) too much/)
       .expect('code', 0)
       .end();
   });

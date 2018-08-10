@@ -40,10 +40,7 @@ $ node ./node_modules/boilerplate-boilerplate/bin/cli.js
 ### Directory
 
 ```bash
-├── bin
-│   └── cli.js
 ├── boilerplate
-│   ├── bin
 │   ├── lib
 │   ├── test
 │   ├── README.md
@@ -67,29 +64,14 @@ $ node ./node_modules/boilerplate-boilerplate/bin/cli.js
 // index.js
 const Boilerplate = require('common-boilerplate');
 
-class TestBoilerplate extends Boilerplate {
-
+class MainBoilerplate extends Boilerplate {
   // must provide your directory
   get [Symbol.for('boilerplate#root')]() {
     return __dirname;
   }
-
-  initQuestions() {
-    const questions = super.initQuestions();
-
-    questions.push(
-      {
-        type: 'list',
-        name: 'type',
-        message: 'choose your type:',
-        choices: [ 'simple', 'plugin', 'framework' ],
-      }
-    );
-    return questions
-  }
 };
 
-module.exports = TestBoilerplate;
+module.exports = MainBoilerplate;
 module.exports.testUtils = Boilerplate.testUtils;
 ```
 
@@ -100,7 +82,7 @@ module.exports.testUtils = Boilerplate.testUtils;
 Add your questions:
 
 ```js
-class TestBoilerplate extends Boilerplate {
+class MainBoilerplate extends Boilerplate {
   initQuestions() {
     const questions = super.initQuestions();
 
@@ -112,7 +94,7 @@ class TestBoilerplate extends Boilerplate {
         choices: [ 'simple', 'plugin', 'framework' ],
       }
     );
-    return questions
+    return questions;
   }
   // ...
 };
@@ -121,7 +103,7 @@ class TestBoilerplate extends Boilerplate {
 `Prompt` as your wish:
 
 ```js
-class TestBoilerplate extends Boilerplate {
+class MainBoilerplate extends Boilerplate {
   async askQuestions() {
     // DO NOT use `Inquirer` directly
     // just use `this.prompt` which will emit event for unit testing
@@ -167,7 +149,7 @@ const nunjucks = require('nunjucks');
 // could disable auto escape
 nunjucks.configure({ autoescape: false });
 
-class TestBoilerplate extends Boilerplate {
+class MainBoilerplate extends Boilerplate {
   async renderTemplate(tpl, locals) {
     return nunjucks.renderString(tpl, locals);
   }
@@ -207,21 +189,21 @@ module.exports.testUtils = Boilerplate.testUtils;
 
 ```js
 // child
-class TestBoilerplate extends Boilerplate {
+class MainBoilerplate extends ShareBoilerplate {
   // must provide your directory
   get [Symbol.for('boilerplate#root')]() {
     return __dirname;
   }
 
   // example for ignore some files from parent
-  async listFiles() {
-    const files = await super.listFiles();
+  async listFiles(...args) {
+    const files = await super.listFiles(...args);
     files['github.png'] = undefined;
     return files;
   }
 };
-module.exports = TestBoilerplate;
-module.exports.testUtils = Boilerplate.testUtils;
+module.exports = MainBoilerplate;
+module.exports.testUtils = ShareBoilerplate.testUtils;
 ```
 
 - must provide getter `Symbol.for('boilerplate#root')` to announce your root, and `boilerplate` directory is required to exists at your root directory.
