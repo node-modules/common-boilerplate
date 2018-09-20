@@ -138,7 +138,7 @@ Built-in render is very simple:
   - `{{ test }}` will replace
   - `\{{ test }}` will skip
   - not support `{{ obj.test }}`
-  - unknown variable will left as what it is
+  - unknown variable will render as empty string
 
 Custom your render logic:
 
@@ -170,6 +170,34 @@ class MainBoilerplate extends Boilerplate {
   - such as `boilerplate/package.json`, npm will read `files` and ignore your files.
   - use `_` as prefix, such as `_package.json` / `_.gitignore` / `_.eslintrc`
   - add your mapping by `this.fileMapping`
+
+### CommandLine argv
+
+Also support custom argv:
+
+- if pass the same name with question, then skip asking user and write it to `locals`
+- `argv` will convert to camelCase, such as `--page-size=1 -> pageSize`
+- see [yargs#optionskey](https://github.com/yargs/yargs/blob/master/docs/api.md#optionskey-opt) for more details
+
+```js
+class MainBoilerplate extends Boilerplate {
+  // use as `--test=123 --str=456`
+  initOptions() {
+    const options = super.initOptions();
+
+    options.test = {
+      type: 'string',
+      description: 'just a test',
+    };
+
+    options.str = {
+      type: 'string',
+      description: 'just a str',
+    };
+    return options;
+  }
+};
+```
 
 ### Boilerplate Chain
 

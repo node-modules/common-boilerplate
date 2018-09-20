@@ -18,4 +18,19 @@ module.exports = class TestBoilerplate extends BaseBoilerplate {
     locals.baseDir = this.context.argv.baseDir;
     return locals;
   }
+
+  initQuestions() {
+    return [
+      {
+        name: 'name',
+        type: 'input',
+        message: 'Project Name: ',
+      },
+      {
+        name: 'description',
+        type: 'input',
+        message: 'Description:',
+      },
+    ];
+  }
 };

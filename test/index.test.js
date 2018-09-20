@@ -2,6 +2,7 @@
 
 const path = require('path');
 const testUtils = require('..').testUtils;
+
 describe('test/index.test.js', () => {
 
   it('should work', () => {
@@ -16,7 +17,7 @@ describe('test/index.test.js', () => {
       .expectFile('README.md', /name = example/)
       .expectFile('README.md', /description = this is a desc/)
       .expectFile('README.md', /type = plugin/)
-      .expectFile('README.md', /empty = {{ empty }}/)
+      .expectFile('README.md', /empty =\s{1}\n/)
       .expectFile('README.md', /escapse = {{ name }}/)
       .expectFile('test/example.test.js', /const mock = require\('egg-mock'\);/)
       .expectFile('.gitignore')
@@ -28,6 +29,9 @@ describe('test/index.test.js', () => {
         boilerplate: {
           name: 'normal',
           version: '1.0.0',
+        },
+        devDependencies: {
+          normal: '^1.0.0',
         },
       })
       .expect('code', 0)
@@ -60,7 +64,10 @@ describe('test/index.test.js', () => {
         author: 'egg',
         boilerplate: {
           name: 'multi-level',
-          version: '1.0.0',
+          version: '1.1.0',
+        },
+        devDependencies: {
+          'multi-level': '^1.1.0',
         },
       })
       .expect('code', 0)
@@ -78,7 +85,7 @@ describe('test/index.test.js', () => {
       .expectFile('README.md', /name = example/)
       .expectFile('README.md', /description = this is a desc/)
       .expectFile('README.md', /type = plugin/)
-      .expectFile('README.md', /empty = {{ empty }}/)
+      .expectFile('README.md', /empty =\s{1}\n/)
       .expectFile('README.md', /escapse = {{ name }}/)
       .expect('code', 0)
       .end();
@@ -86,6 +93,22 @@ describe('test/index.test.js', () => {
 
   describe('argv', () => {
     const cwd = path.join(__dirname, '.tmp');
+
+    it('should cp argv to locals', () => {
+      const options = {
+        baseDir: 'argv',
+        args: [ '--name=argv', '--test=123' ],
+      };
+      return testUtils.run(options)
+        .waitForPrompt()
+        // .debug()
+        .write('this is a desc\n')
+        .expectFile('README.md', /name = argv/)
+        .expectFile('README.md', /description = this is a desc/)
+        .expectFile('README.md', 'test = 123')
+        .expect('code', 0)
+        .end();
+    });
 
     it('--baseDir', () => {
       const options = {
@@ -98,6 +121,8 @@ describe('test/index.test.js', () => {
       return testUtils.run(options)
         .waitForPrompt()
         // .debug()
+        .write('example\n')
+        .write('this is a desc\n')
         .expect('stdout', /one context: true/)
         .expectFile('README.md', `# README\n\nbaseDir = ${cwd}\n`)
         .expect('code', 0)
@@ -115,6 +140,8 @@ describe('test/index.test.js', () => {
       return testUtils.run(options)
         .waitForPrompt()
         // .debug()
+        .write('example\n')
+        .write('this is a desc\n')
         .expect('stdout', /one context: true/)
         .expectFile('README.md', `# README\n\nbaseDir = ${cwd}\n`)
         .expect('code', 0)
@@ -129,6 +156,8 @@ describe('test/index.test.js', () => {
       return testUtils.run(options)
         .waitForPrompt()
         // .debug()
+        .write('example\n')
+        .write('this is a desc\n')
         .expect('stdout', /one context: true/)
         .expectFile('README.md', `# README\n\nbaseDir = ${cwd}\n`)
         .expect('code', 0)
