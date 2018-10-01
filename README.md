@@ -37,6 +37,16 @@ $ npm i boilerplate-boilerplate
 $ node ./node_modules/boilerplate-boilerplate/bin/cli.js
 ```
 
+### Lifecycle
+
+```bash
+- ask question
+- list all file from boilerplate paths
+- render files to target dir
+- npm install
+- run unit test
+```
+
 ### Directory
 
 ```bash
@@ -170,6 +180,20 @@ class MainBoilerplate extends Boilerplate {
   - such as `boilerplate/package.json`, npm will read `files` and ignore your files.
   - use `_` as prefix, such as `_package.json` / `_.gitignore` / `_.eslintrc`
   - add your mapping by `this.fileMapping`
+
+### Logger
+
+Provide logger for developer, see [signale](https://github.com/klauscfhq/signale) for more details.
+
+`debug` is disabled by default, use `--verbose` to print all logs.
+
+```js
+this.logger.info('this is a log');
+
+this.logger.disable('info');
+
+this.logger.enable('debug');
+```
 
 ### CommandLine argv
 

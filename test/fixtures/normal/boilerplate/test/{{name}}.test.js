@@ -1,10 +1,9 @@
 'use strict';
 
-const mock = require('egg-mock');
+const assert = require('assert');
 
 describe('test/index.test.js', () => {
-
-  afterEach(mock.restore);
-
-  it('should work', () => {});
+  it('should work', () => {
+    assert(true);
+  });
 });

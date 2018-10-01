@@ -19,7 +19,7 @@ describe('test/index.test.js', () => {
       .expectFile('README.md', /type = plugin/)
       .expectFile('README.md', /empty =\s{1}\n/)
       .expectFile('README.md', /escapse = {{ name }}/)
-      .expectFile('test/example.test.js', /const mock = require\('egg-mock'\);/)
+      .expectFile('test/example.test.js', /const assert = require\('assert'\);/)
       .expectFile('.gitignore')
       .expectFile('.eslintrc')
       .expectFile('github.png')
@@ -30,11 +30,13 @@ describe('test/index.test.js', () => {
           name: 'normal',
           version: '1.0.0',
         },
-        devDependencies: {
-          normal: '^1.0.0',
-        },
+        // devDependencies: {
+        //   normal: '^1.0.0',
+        // },
       })
       .expect('code', 0)
+      .expect('stdout', /npm install --no-package-lock/)
+      .expect('stdout', /1 passing/)
       .end();
   });
 
@@ -51,9 +53,6 @@ describe('test/index.test.js', () => {
       // override file
       .expectFile('README.md', /name = example/)
       .expectFile('README.md', /another = ANOTHER/)
-      // replace string
-      .expectFile('test/example.test.js')
-      .expectFile('test/example.test.js', /const mock = require\('@ali\/mm'\);/)
       // new file
       .expectFile('index.json')
       // remove file
@@ -66,9 +65,9 @@ describe('test/index.test.js', () => {
           name: 'multi-level',
           version: '1.1.0',
         },
-        devDependencies: {
-          'multi-level': '^1.1.0',
-        },
+        // devDependencies: {
+        //   'multi-level': '^1.1.0',
+        // },
       })
       .expect('code', 0)
       .end();
@@ -77,6 +76,7 @@ describe('test/index.test.js', () => {
   it('should support mutli prompt', () => {
     return testUtils.run('mutli-prompt')
       .waitForPrompt()
+      // .debug()
       .write('example\n')
       .write('this is a desc\n')
       .choose(1)

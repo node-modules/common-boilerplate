@@ -29,11 +29,4 @@ module.exports = class TestBoilerplate extends BaseBoilerplate {
     files['github.png'] = undefined;
     return files;
   }
-
-  async saveFile({ fileInfo }) {
-    if (fileInfo.isText && fileInfo.key !== 'package.json') {
-      fileInfo.content = fileInfo.content.replace(/\begg-mock\b/g, '@ali/mm');
-    }
-    return await super.saveFile({ fileInfo });
-  }
 };
