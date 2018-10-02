@@ -1,4 +1,7 @@
 {
   "name": "test-utils",
-  "version": "1.0.0"
+  "version": "1.0.0",
+  "scripts": {
+    "test": "echo 'this is a test'"
+  }
 }

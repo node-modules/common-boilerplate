@@ -21,6 +21,11 @@ module.exports = class TestBoilerplate extends BaseBoilerplate {
         type: 'input',
         message: 'Description:',
       },
+      {
+        name: 'a.b',
+        type: 'input',
+        message: 'Nested:',
+      },
     ];
   }
 

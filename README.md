@@ -44,7 +44,7 @@ $ node ./node_modules/boilerplate-boilerplate/bin/cli.js
 - list all file from boilerplate paths
 - render files to target dir
 - npm install
-- run unit test
+- unit test
 ```
 
 ### Directory
@@ -94,69 +94,63 @@ Add your questions:
 ```js
 class MainBoilerplate extends Boilerplate {
   initQuestions() {
-    const questions = super.initQuestions();
+    const questions = [
+      // remain super questions
+      ...super.initQuestions(),
 
-    questions.push(
+      // add new questions
+      {
+        name: 'name',
+        type: 'input',
+        message: 'Project Name: ',
+        default: () => this.locals.name, // set default from locals
+      },
       {
         type: 'list',
         name: 'type',
         message: 'choose your type:',
         choices: [ 'simple', 'plugin', 'framework' ],
       }
-    );
+    ];
     return questions;
   }
   // ...
 };
 ```
 
-`Prompt` as your wish:
+### Locals
 
-```js
-class MainBoilerplate extends Boilerplate {
-  async askQuestions() {
-    // DO NOT use `Inquirer` directly
-    // just use `this.prompt` which will emit event for unit testing
-    const answer = await this.prompt([
-      {
-        type: 'input',
-        name: 'name',
-        message: 'What\'s your project name:',
-      },
-    ]);
+`this.locals` is used to fill the teamplte, it's merge from `built-int -> argv -> user's prompt answer`;
 
-    // should write to `this.locals`
-    Object.assign(this.locals, answer);
-  }
-};
-```
+**Built-in:**
+
+- `name` - project name, by default to `git repository name`
+- `user` - user info
+  - `name` - `git config user.name`
+  - `email` - read from git user email
+  - `author` - `${user} <${email}>`
+- `git` - git url info
+  - extract from `git config remote.origin.url`
+  - see [git-url-parse](https://github.com/IonicaBizau/git-url-parse) for more details.
+- `npm` - npm global cli name, will guest by order: `tnpm -> cnpm -> npm`
+- `registry` - npm registry url, not set by default
 
 ### Template Render
 
 Built-in render is very simple:
 
-- `this.locals` will be use to fill the teamplte
-  - come from user's prompt answer
-  - built-in locals:
-    - `repository` - read from git remote url
-    - `org` - read from git remote url
-    - `name` - read from git remote url
-    - `user` - read from git user name
-    - `email` - read from git user email
-    - `author` - `${user} <${email}>`
-- Rule:
-  - `{{ test }}` will replace
-  - `\{{ test }}` will skip
-  - not support `{{ obj.test }}`
-  - unknown variable will render as empty string
+- `{{ test }}` will replace
+- `\{{ test }}` will skip
+- support nested value such as `{{ obj.test }}`
+- unknown variable will render as empty string
 
-Custom your render logic:
+**Custom your render logic:**
 
 ```js
 // recommended to use https://github.com/mozilla/nunjucks
 const nunjucks = require('nunjucks');
 
-// could disable auto escape
+// perfer to disable auto escape
 nunjucks.configure({ autoescape: false });
 
 class MainBoilerplate extends Boilerplate {
@@ -181,16 +175,30 @@ class MainBoilerplate extends Boilerplate {
   - use `_` as prefix, such as `_package.json` / `_.gitignore` / `_.eslintrc`
   - add your mapping by `this.fileMapping`
 
+**Default mappings:**
+
+```js
+this.fileMapping = {
+  gitignore: '.gitignore',
+  _gitignore: '.gitignore',
+  '_.gitignore': '.gitignore',
+  '_package.json': 'package.json',
+  '_.eslintrc': '.eslintrc',
+  '_.eslintignore': '.eslintignore',
+  '_.npmignore': '.npmignore',
+};
+```
+
 ### Logger
 
-Provide logger for developer, see [signale](https://github.com/klauscfhq/signale) for more details.
+Provide powerful cli logger for developer, see [signale](https://github.com/klauscfhq/signale) for more details.
 
 `debug` is disabled by default, use `--verbose` to print all logs.
 
 ```js
 this.logger.info('this is a log');
 
-this.logger.disable('info');
+this.logger.disable([ 'info', 'debug' ]);
 
 this.logger.enable('debug');
 ```
@@ -201,6 +209,7 @@ Also support custom argv:
 
 - if pass the same name with question, then skip asking user and write it to `locals`
 - `argv` will convert to camelCase, such as `--page-size=1 -> pageSize`
+- dot prop will convert to nested object, such as `--page.size=1 -> { page: { size: '1' } }`
 - see [yargs#optionskey](https://github.com/yargs/yargs/blob/master/docs/api.md#optionskey-opt) for more details
 
 ```js
@@ -218,10 +227,17 @@ class MainBoilerplate extends Boilerplate {
       type: 'string',
       description: 'just a str',
     };
+
     return options;
   }
 };
 ```
+
+**Built-in:**
+
+- `--baseDir=` - directory of application, default to `process.cwd()`
+- `--npm=` - npm cli, tnpm/cnpm/npm, will auto guess
+- `--registry=` - npm registry url, also support alias `-r=china`
 
 ### Boilerplate Chain
 

@@ -1,12 +1,14 @@
 {
   "name": "common-boilerplate",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "base class for boilerplate",
   "dependencies": {
     "chalk": "^2.4.1",
     "coffee": "^5.1.0",
     "common-bin": "^2.7.3",
     "debug": "^3.1.0",
+    "extend2": "^1.0.0",
+    "get-value": "^3.0.1",
     "git-url-parse": "^10.0.1",
     "globby": "^8.0.1",
     "inquirer": "^6.1.0",

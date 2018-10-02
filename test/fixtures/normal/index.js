@@ -10,6 +10,7 @@ class TestBoilerplate extends BaseBoilerplate {
 
   initQuestions() {
     return [
+      ...super.initQuestions(),
       {
         name: 'name',
         type: 'input',
@@ -25,13 +26,13 @@ class TestBoilerplate extends BaseBoilerplate {
         name: 'repository',
         type: 'input',
         message: 'Repository:',
-        default: () => this.locals.repository,
+        default: () => this.locals.git.href,
       },
       {
         name: 'author',
         type: 'input',
         message: 'Author:',
-        default: () => `${this.locals.user} <${this.locals.email}>`,
+        default: () => this.locals.user.author,
       },
       {
         type: 'list',
