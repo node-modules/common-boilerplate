@@ -1,6 +1,6 @@
 'use strict';
 
-const BaseBoilerplate = require('../normal');
+const BaseBoilerplate = require('../simple');
 
 module.exports = class TestBoilerplate extends BaseBoilerplate {
 
@@ -8,25 +8,17 @@ module.exports = class TestBoilerplate extends BaseBoilerplate {
     return __dirname;
   }
 
-  initQuestions() {
-    const questions = super.initQuestions();
-
-    // change parent question
-    const q = questions.filter(x => x.name === 'author')[0];
-    q.default = 'egg';
-
-    questions.push({
-      type: 'input',
-      name: 'another',
-      message: 'Another question:',
-    });
-
-    return questions;
-  }
-
   async listFiles(...args) {
     const files = await super.listFiles(...args);
     files['github.png'] = undefined;
     return files;
+  }
+
+  async npmInstall() {
+    // do nth
+  }
+
+  async runTest() {
+    // do nth
   }
 };

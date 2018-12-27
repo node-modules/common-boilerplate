@@ -21,23 +21,12 @@ class TestBoilerplate extends BaseBoilerplate {
         name: 'description',
         type: 'input',
         message: 'Description:',
-      },
-      {
-        name: 'repository',
-        type: 'input',
-        message: 'Repository:',
-        default: () => this.locals.git.href,
-      },
-      {
-        name: 'author',
-        type: 'input',
-        message: 'Author:',
-        default: () => this.locals.user.author,
+        default: res => `this is description of ${res.name}`,
       },
       {
         type: 'list',
         name: 'type',
-        message: 'choose your type:',
+        message: 'Choose your type:',
         choices: [ 'simple', 'plugin', 'framework' ],
       },
     ];

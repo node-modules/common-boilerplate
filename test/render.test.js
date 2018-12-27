@@ -1,25 +1,35 @@
 'use strict';
 
-const testUtils = require('..').testUtils;
+const path = require('path');
+const coffee = require('coffee');
+const assertFile = require('assert-file');
+const { rimraf, mkdirp } = require('mz-modules');
 
 describe('test/render.test.js', () => {
-  it('should work', () => {
-    const options = {
-      baseDir: 'render',
-      args: [ '--name=example', '--test=123', '--a.c=789' ],
-    };
-    return testUtils.run(options)
+  const fixtures = path.join(__dirname, 'fixtures');
+  const tmpDir = path.join(__dirname, '.tmp');
+
+  beforeEach(async () => {
+    await rimraf(tmpDir);
+    await mkdirp(tmpDir);
+  });
+
+  it('should work', async () => {
+    await coffee.fork(path.join(fixtures, 'render/bin/cli.js'), [ '--test=123', '--a.c=789' ], { cwd: tmpDir })
       // .debug()
-      .write('this is a desc\n')
-      .write('456\n')
-      .expectFile('README.md', 'name = example')
-      .expectFile('README.md', 'description = this is a desc')
-      .expectFile('README.md', 'test = 123')
-      .expectFile('README.md', 'nested = 456')
-      .expectFile('README.md', 'nested2 = 789')
-      .expectFile('README.md', 'skip = {{ skip }}')
-      .expectFile('README.md', 'empty = __')
+      .waitForPrompt()
+      .writeKey('example\n')
+      .writeKey('this is a desc\n')
+      .writeKey('456')
       .expect('code', 0)
       .end();
+
+    assertFile(`${tmpDir}/README.md`, 'name = example');
+    assertFile(`${tmpDir}/README.md`, 'description = this is a desc');
+    assertFile(`${tmpDir}/README.md`, 'test = 123');
+    assertFile(`${tmpDir}/README.md`, 'nested = 456');
+    assertFile(`${tmpDir}/README.md`, 'nested2 = 789');
+    assertFile(`${tmpDir}/README.md`, 'skip = {{ skip }}');
+    assertFile(`${tmpDir}/README.md`, 'empty = __');
   });
 });
