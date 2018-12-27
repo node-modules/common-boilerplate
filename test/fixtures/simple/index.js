@@ -1,6 +1,6 @@
 'use strict';
 
-const BaseBoilerplate = require('../../../index');
+const BaseBoilerplate = require('../../..');
 
 class TestBoilerplate extends BaseBoilerplate {
 

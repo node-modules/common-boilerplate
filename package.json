@@ -2,6 +2,7 @@
   "name": "common-boilerplate",
   "version": "0.4.0",
   "description": "base class for boilerplate",
+  "main": "./lib/base",
   "dependencies": {
     "common-bin-plus": "^0.0.1",
     "debug": "^4.1.1",
@@ -37,20 +38,16 @@
     "test-local": "egg-bin test",
     "cov": "egg-bin cov",
     "ci": "npm run lint && egg-bin pkgfiles --check && npm run cov",
-    "pkgfiles": "egg-bin pkgfiles",
-    "fixture": "rm -rf ./test/.tmp && node ./lib/start_cli.js ./test/.tmp"
+    "pkgfiles": "egg-bin pkgfiles"
   },
   "ci": {
-    "version": "8, 10"
+    "version": "8, 10, 11"
   },
   "eslintIgnore": [
     "coverage",
     "dist"
   ],
-  "repository": {
-    "type": "git",
-    "url": "git@github.com:node-modules/common-boilerplate.git"
-  },
+  "repository": "git@github.com:node-modules/common-boilerplate.git",
   "files": [
     "index.js",
     "lib"
