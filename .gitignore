@@ -9,4 +9,5 @@ run/
 .vscode
 .tmp
 test/.tmp
+.nyc_output
 

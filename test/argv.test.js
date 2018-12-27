@@ -89,6 +89,19 @@ describe('test/argv.test.js', () => {
 
       assertFile(`${tmpDir}/README.md`, 'npm = cnpm');
     });
+
+    it('should support --npm', async () => {
+      await coffee.fork(path.join(fixtures, 'argv/bin/cli.js'), [ '--npm=pnpm' ], { cwd: tmpDir })
+        // .debug()
+        .waitForPrompt()
+        .writeKey('example\n')
+        .writeKey('this is a desc\n')
+        .writeKey('ENTER')
+        .expect('code', 0)
+        .end();
+
+      assertFile(`${tmpDir}/README.md`, 'npm = pnpm');
+    });
   });
 
   describe('locals: registry', () => {
