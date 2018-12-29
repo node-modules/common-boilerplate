@@ -4,7 +4,7 @@
   "description": "base class for boilerplate",
   "main": "./lib/base",
   "dependencies": {
-    "common-bin-plus": "^0.0.2",
+    "common-bin-plus": "^1.0.0",
     "debug": "^4.1.1",
     "extend2": "^1.0.0",
     "get-value": "^3.0.1",
