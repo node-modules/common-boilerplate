@@ -82,7 +82,6 @@ class MainBoilerplate extends Boilerplate {
 };
 
 module.exports = MainBoilerplate;
-module.exports.testUtils = Boilerplate.testUtils;
 ```
 
 ### Ask questions
@@ -120,14 +119,14 @@ class MainBoilerplate extends Boilerplate {
 
 ### Locals
 
-`this.locals` is used to fill the teamplte, it's merge from `built-int -> argv -> user's prompt answer`;
+`this.locals` is used to fill the teamplte, it's merge from `built-in -> argv -> user's prompt answer`;
 
 **Built-in:**
 
 - `name` - project name, by default to `git repository name`
 - `user` - user info
   - `name` - `git config user.name`
-  - `email` - read from git user email
+  - `email` - `git config user.email`
   - `author` - `${user} <${email}>`
 - `git` - git url info
   - extract from `git config remote.origin.url`
@@ -191,16 +190,14 @@ this.fileMapping = {
 
 ### Logger
 
-Provide powerful cli logger for developer, see [signale](https://github.com/klauscfhq/signale) for more details.
+Provide powerful cli logger for developer, see [zlogger](https://github.com/node-modules/zlogger) for more details.
 
-`debug` is disabled by default, use `--verbose` to print all logs.
+`debug` is disabled by default, use `--verbose` or `DEBUG=CLI` to print all logs.
 
 ```js
-this.logger.info('this is a log');
+this.logger.info('this is info log');
 
-this.logger.disable([ 'info', 'debug' ]);
-
-this.logger.enable('debug');
+this.logger.level = 'debug';
 ```
 
 ### CommandLine argv
@@ -216,7 +213,7 @@ Also support custom argv:
 class MainBoilerplate extends Boilerplate {
   // use as `--test=123 --str=456`
   initOptions() {
-    const options = super.initOptions();
+    const options = Object.assign({}, super.initOptions());
 
     options.test = {
       type: 'string',
@@ -251,8 +248,6 @@ class ShareBoilerplate extends Boilerplate {
   }
 };
 module.exports = ShareBoilerplate;
-// don't forgot to exports `testUtils`
-module.exports.testUtils = Boilerplate.testUtils;
 ```
 
 ```js
@@ -271,7 +266,6 @@ class MainBoilerplate extends ShareBoilerplate {
   }
 };
 module.exports = MainBoilerplate;
-module.exports.testUtils = ShareBoilerplate.testUtils;
 ```
 
 - must provide getter `Symbol.for('boilerplate#root')` to announce your root, and `boilerplate` directory is required to exists at your root directory.
@@ -280,44 +274,55 @@ module.exports.testUtils = ShareBoilerplate.testUtils;
 
 ## Unit Testing
 
-Extends [Coffee](https://github.com/node-modules/coffee) to provide testUtils for cli.
+Use [Coffee](https://github.com/node-modules/coffee) and [assert-file](https://github.com/node-modules/assert-file).
 
 ```js
-const testUtils = require('common-boilerplate').testUtils;
+const coffee = require('coffee');
+const assertFile = require('assert-file');
+const { rimraf, mkdirp } = require('mz-modules');
 
 describe('test/index.test.js', () => {
-  it('should work', () => {
-    return testUtils.run()
+  const fixtures = path.join(__dirname, 'fixtures');
+  const tmpDir = path.join(__dirname, '.tmp');
+
+  beforeEach(async () => {
+    await rimraf(tmpDir);
+    await mkdirp(tmpDir);
+  });
+
+  it('should work', async () => {
+    // run cli
+    await coffee.fork(path.join(fixtures, 'simple/bin/cli.js'), [], { cwd: tmpDir })
       // .debug()
+      // tell coffee to listen prompt event then auto answer
       .waitForPrompt()
       // answer to the questions
-      .write('example\n')
+      .writeKey('example\n')
+      .writeKey('ENTER')
       // emit `DOWN` key to select the second choise
-      .choose(2)
-
-      // expect README.md to be exists
-      .expectFile('README.md')
-
-      // check with `includes`
-      .expectFile('README.md', 'this is a desc')
-
-      // check with regex
-      .expectFile('README.md', /desc/)
-
-      // check whether contains
-      .expectFile('package.json', { name: 'example' })
-
-      // opposite assertion
-      .notExpectFile('not-exist')
-      .notExpectFile('README.md', 'sth')
-
-      // see others at `coffee` docs
-      .expect('stdout', /some console message/)
-      .expect('stderr', /some error message/)
+      .writeKey('DOWN', 'ENTER')
+      .expect('stdout', /npm install --no-package-lock/)
+      .expect('stdout', /1 passing/)
       .expect('code', 0)
-
-      // don't forgot to call `end()`
       .end();
+
+    // expect to be exists
+    assertFile(`${tmpDir}/.gitignore`);
+
+    // check with `includes`
+    assertFile(`${tmpDir}/README.md`, 'name = example');
+
+    // check with regex
+    assertFile(`${tmpDir}/README.md`, /name = example/);
+
+    // check whether contains json
+    assertFile(`${tmpDir}/package.json`, {
+      name: 'example',
+      boilerplate: {
+        name: 'common-boilerplate-test-project',
+        version: '1.0.0',
+      }
+    });
   });
 });
 ```
