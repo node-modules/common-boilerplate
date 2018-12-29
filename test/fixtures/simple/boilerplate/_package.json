@@ -1,0 +1,29 @@
+{
+  "name": "{{ name }}",
+  "version": "1.0.0",
+  "description": "{{ description }}",
+  "devDependencies": {
+    "egg-init-config": "*",
+    "mocha": "*"
+  },
+  "scripts": {
+    "test": "mocha test/**/*.test.js"
+  },
+  "engines": {
+    "node": ">=6.0.0"
+  },
+  "ci": {
+    "version": "6, 8"
+  },
+  "eslintIgnore": [ "coverage", "dist" ],
+  "repository": {
+    "type": "git",
+    "url": "{{ repository }}"
+  },
+  "files": [
+    "lib",
+    "index.js"
+  ],
+  "author": "{{ author }}",
+  "license": "MIT"
+}

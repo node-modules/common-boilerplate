@@ -6,8 +6,4 @@ coverage/
 run/
 .DS_Store
 *.swp
-.vscode
-.tmp
-test/.tmp
-.nyc_output
 
