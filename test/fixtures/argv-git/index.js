@@ -13,7 +13,7 @@ module.exports = class TestBoilerplate extends BaseBoilerplate {
     this.locals.localInfo = JSON.stringify(this.locals, null, 2);
   }
 
-  async npmInstall() {
+  async installDeps() {
     // skip
   }
 

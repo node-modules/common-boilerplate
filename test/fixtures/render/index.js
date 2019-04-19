@@ -29,7 +29,7 @@ module.exports = class TestBoilerplate extends BaseBoilerplate {
     ];
   }
 
-  async npmInstall() {
+  async installDeps() {
     // skip
   }
 
