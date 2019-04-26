@@ -200,6 +200,16 @@ this.logger.info('this is info log');
 this.logger.level = 'debug';
 ```
 
+### HttpClient
+
+Provide httpclient for developer, see [urllib](https://github.com/node-modules/urllib) for more details.
+
+```js
+await this.request(url, opts);
+```
+
+Use `this.requestOpts` as default request options.
+
 ### CommandLine argv
 
 Also support custom argv:
@@ -234,7 +244,7 @@ class MainBoilerplate extends Boilerplate {
 
 - `--baseDir=` - directory of application, default to `process.cwd()`
 - `--npm=` - npm cli, tnpm/cnpm/npm, will auto guess
-- `--registry=` - npm registry url, also support alias `-r=china`
+- `--registry=` - npm registry url, also support alias `-r=china`, will auto guest from npm cli.
 
 ### Boilerplate Chain
 
