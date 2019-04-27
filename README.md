@@ -92,12 +92,8 @@ Add your questions:
 
 ```js
 class MainBoilerplate extends Boilerplate {
-  initQuestions() {
+  async initQuestions() {
     const questions = [
-      // remain super questions
-      ...super.initQuestions(),
-
-      // add new questions
       {
         name: 'name',
         type: 'input',
@@ -245,6 +241,7 @@ class MainBoilerplate extends Boilerplate {
 - `--baseDir=` - directory of application, default to `process.cwd()`
 - `--npm=` - npm cli, tnpm/cnpm/npm, will auto guess
 - `--registry=` - npm registry url, also support alias `-r=china`, will auto guest from npm cli.
+- `--force` - force to override directory if it's not empty
 
 ### Boilerplate Chain
 

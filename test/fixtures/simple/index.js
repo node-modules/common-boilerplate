@@ -8,9 +8,9 @@ class TestBoilerplate extends BaseBoilerplate {
     return __dirname;
   }
 
-  initQuestions() {
+  async initQuestions() {
     return [
-      ...super.initQuestions(),
+      ...await super.initQuestions(),
       {
         name: 'name',
         type: 'input',
