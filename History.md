@@ -1,4 +1,10 @@
 
+0.7.0 / 2019-04-27
+==================
+
+**features**
+  * [[`059878c`](http://github.com/node-modules/common-boilerplate/commit/059878c9ae987892f69bd31a2b45116f54ab9604)] - feat: built-in httpclient (#2) (TZ | 天猪 <<atian25@qq.com>>)
+
 0.6.0 / 2019-04-19
 ==================
 
