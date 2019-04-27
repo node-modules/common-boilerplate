@@ -4,6 +4,7 @@ const path = require('path');
 const coffee = require('coffee');
 const assertFile = require('assert-file');
 const { rimraf, mkdirp } = require('mz-modules');
+const mock = require('mm');
 
 describe('test/render.test.js', () => {
   const fixtures = path.join(__dirname, 'fixtures');
@@ -12,6 +13,8 @@ describe('test/render.test.js', () => {
   beforeEach(async () => {
     await rimraf(tmpDir);
     await mkdirp(tmpDir);
+    mock.restore();
+    mock(process.env, 'BOILERPLATE_TEST', true);
   });
 
   it('should work', async () => {

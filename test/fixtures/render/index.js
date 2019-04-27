@@ -29,10 +29,6 @@ module.exports = class TestBoilerplate extends BaseBoilerplate {
     ];
   }
 
-  async installDeps() {
-    // skip
-  }
-
   async runTest() {
     // skip
   }

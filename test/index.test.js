@@ -21,7 +21,7 @@ describe('test/index.test.js', () => {
       .writeKey('example\n')
       .writeKey('ENTER')
       .writeKey('DOWN', 'ENTER')
-      .expect('stdout', /npm install --no-package-lock/)
+      .expect('stdout', /npm install .* --no-package-lock/)
       .expect('stdout', /1 passing/)
       .expect('code', 0)
       .end();
