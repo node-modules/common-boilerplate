@@ -1,4 +1,13 @@
 
+0.11.0 / 2021-06-08
+==================
+
+**features**
+  * [[`6ab2376`](http://github.com/node-modules/common-boilerplate/commit/6ab2376e2a57b91ae38099c23f78f264aefd6cbd)] - feat: change cnpm registry (TZ <<atian25@qq.com>>)
+
+**fixes**
+  * [[`41f60a0`](http://github.com/node-modules/common-boilerplate/commit/41f60a04dbb26bcd1df7ef691a408dd2abc38910)] - fix: render filepath (TZ <<atian25@qq.com>>)
+
 0.10.0 / 2021-06-08
 ==================
 
