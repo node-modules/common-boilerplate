@@ -9,6 +9,6 @@ test = {{ test }}
 nested = {{ a.b }}
 nested2 = {{ a.c }}
 
-skip = \{{ skip }}
+skip = {% raw %}{{ skip }}{% endraw %}
 
 empty = _{{ empty }}_

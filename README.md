@@ -132,34 +132,12 @@ class MainBoilerplate extends Boilerplate {
 
 ### Template Render
 
-Built-in render is very simple:
+Built-in render is [nunjucks](https://github.com/mozilla/nunjucks).
 
-- `{{ test }}` will replace
-- `\{{ test }}` will skip
-- support nested value such as `{{ obj.test }}`
-- unknown variable will render as empty string
-
-**Custom your render logic:**
+And use [micromatch](https://github.com/micromatch/micromatch) to match `this.templateRules` to treat as template.
 
 ```js
-// recommended to use https://github.com/mozilla/nunjucks
-const nunjucks = require('nunjucks');
-
-// perfer to disable auto escape
-nunjucks.configure({ autoescape: false });
-
-class MainBoilerplate extends Boilerplate {
-  async renderTemplate(tpl, locals) {
-    return nunjucks.renderString(tpl, locals);
-  }
-
-  // custom your locals
-  async initLocals() {
-    const locals = await super.initLocals();
-    locals.foo = 'bar';
-    return locals;
-  }
-};
+this.templateRules = [ '!res/**' ];
 ```
 
 ### File Name Convert
