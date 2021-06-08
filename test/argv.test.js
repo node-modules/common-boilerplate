@@ -36,6 +36,7 @@ describe('test/argv.test.js', () => {
     const cwd = path.join(__dirname, '.tmp');
 
     it('--baseDir', async () => {
+      await rimraf(tmpDir);
       await coffee.fork(path.join(fixtures, 'argv/bin/cli.js'), [ '--baseDir', '.tmp' ], { cwd: __dirname })
         // .debug()
         .waitForPrompt()
