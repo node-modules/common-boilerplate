@@ -128,7 +128,7 @@ describe('test/argv.test.js', () => {
         .expect('code', 0)
         .end();
 
-      assertFile(`${tmpDir}/README.md`, 'registry = https://registry.npm.taobao.org');
+      assertFile(`${tmpDir}/README.md`, 'registry = https://registry.nlark.com');
     });
 
     it('should convert --registry=npm', async () => {
