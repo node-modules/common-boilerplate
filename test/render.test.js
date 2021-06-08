@@ -38,5 +38,6 @@ describe('test/render.test.js', () => {
     // not treat as template
     assertFile(`${tmpDir}/boilerplate/README.md`, 'name = {{ name }}');
     assertFile(`${tmpDir}/boilerplate/.abc`, 'description = {{ description }}');
+    assertFile(`${tmpDir}/boilerplate/{{name}}.md`, 'description = {{ description }}');
   });
 });

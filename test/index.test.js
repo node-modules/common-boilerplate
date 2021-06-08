@@ -14,9 +14,9 @@ describe('test/index.test.js', () => {
     await mkdirp(tmpDir);
   });
 
-  it.only('should work', async () => {
+  it('should work', async () => {
     await coffee.fork(path.join(fixtures, 'simple/bin/cli.js'), [], { cwd: tmpDir })
-      .debug()
+      // .debug()
       .waitForPrompt()
       .writeKey('example\n')
       .writeKey('ENTER')
