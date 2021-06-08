@@ -3,6 +3,10 @@
 const BaseBoilerplate = require('../../..');
 
 module.exports = class TestBoilerplate extends BaseBoilerplate {
+  constructor(...args) {
+    super(...args);
+    this.templateRules = [ '!boilerplate/**' ];
+  }
 
   get [Symbol.for('boilerplate#root')]() {
     return __dirname;

@@ -34,5 +34,9 @@ describe('test/render.test.js', () => {
     assertFile(`${tmpDir}/README.md`, 'nested2 = 789');
     assertFile(`${tmpDir}/README.md`, 'skip = {{ skip }}');
     assertFile(`${tmpDir}/README.md`, 'empty = __');
+
+    // not treat as template
+    assertFile(`${tmpDir}/boilerplate/README.md`, 'name = {{ name }}');
+    assertFile(`${tmpDir}/boilerplate/.abc`, 'description = {{ description }}');
   });
 });
