@@ -17,7 +17,7 @@ describe('test/argv.test.js', () => {
 
   it('should merge argv to locals', async () => {
     await coffee.fork(path.join(fixtures, 'argv/bin/cli.js'), [ '--name=argv', '--test=123', '--a.b.c=456' ], { cwd: tmpDir })
-      // .debug()
+      .debug()
       .waitForPrompt()
       .writeKey('this is a desc\n')
       .writeKey('ENTER')
