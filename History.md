@@ -1,4 +1,10 @@
 
+0.12.0 / 2021-06-10
+==================
+
+**others**
+  * [[`7ccb212`](http://github.com/node-modules/common-boilerplate/commit/7ccb21219b6c4287586cf8eb008454337d0c5314)] - deps: update logger (#7) (TZ | 天猪 <<atian25@qq.com>>)
+
 0.11.0 / 2021-06-08
 ==================
 
