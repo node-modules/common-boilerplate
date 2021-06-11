@@ -33,8 +33,7 @@ $ npm i common-boilerplate --save
 use [boilerplate-boilerplate](https://github.com/node-modules/boilerplate-boilerplate) for quick start.
 
 ```bash
-$ npm i boilerplate-boilerplate
-$ node ./node_modules/boilerplate-boilerplate/bin/cli.js
+$ npm init @nodemodules/boilerplate
 ```
 
 ### Lifecycle
@@ -43,8 +42,6 @@ $ node ./node_modules/boilerplate-boilerplate/bin/cli.js
 - ask question
 - list all file from boilerplate paths
 - render files to target dir
-- npm install
-- unit test
 ```
 
 ### Directory
@@ -105,7 +102,9 @@ class MainBoilerplate extends Boilerplate {
         name: 'type',
         message: 'choose your type:',
         choices: [ 'simple', 'plugin', 'framework' ],
-      }
+      },
+      // use built-in questions
+      this.getBuiltinQuestions('repository', {}, {}),
     ];
     return questions;
   }
@@ -124,7 +123,7 @@ class MainBoilerplate extends Boilerplate {
   - `name` - `git config user.name`
   - `email` - `git config user.email`
   - `author` - `${user} <${email}>`
-- `git` - git url info
+- `gitInfo` - git url info
   - extract from `git config remote.origin.url`
   - see [git-url-parse](https://github.com/IonicaBizau/git-url-parse) for more details.
 - `npm` - npm global cli name, will guest by order: `tnpm -> cnpm -> npm`
@@ -164,14 +163,14 @@ this.fileMapping = {
 
 ### Logger
 
-Provide powerful cli logger for developer, see [zlogger](https://github.com/node-modules/zlogger) for more details.
+Provide powerful cli logger for developer, see [consola](https://github.com/unjs/consola) for more details.
 
-`debug` is disabled by default, use `--verbose` or `DEBUG=CLI` to print all logs.
+`debug` is disabled by default, use `--verbose` or `DEBUG=` to print all logs.
 
 ```js
 this.logger.info('this is info log');
 
-this.logger.level = 'debug';
+this.logger.level = 'DEBUG';
 ```
 
 ### HttpClient

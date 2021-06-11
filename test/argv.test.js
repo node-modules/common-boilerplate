@@ -180,7 +180,7 @@ describe('test/argv.test.js', () => {
           email: 'tz@pig.com',
           author: 'Pig <tz@pig.com>',
         },
-        git: {
+        gitInfo: {
           href: 'git@github.com:tz/test.git',
           name: 'test',
           owner: 'tz',

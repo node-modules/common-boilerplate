@@ -12,6 +12,7 @@
     "extend2": "^1.0.0",
     "git-url-parse": "^11.4.4",
     "globby": "^11.0.3",
+    "hosted-git-info": "^4.0.2",
     "istextorbinary": "^5.12.0",
     "micromatch": "^4.0.4",
     "mz": "^2.7.0",
