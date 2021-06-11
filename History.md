@@ -1,4 +1,10 @@
 
+0.13.0 / 2021-06-11
+==================
+
+**features**
+  * [[`5572dc5`](http://github.com/node-modules/common-boilerplate/commit/5572dc5eab3ccf88ce3593385d5ed8e95f91a0f0)] - feat: built-in question (#8) (TZ | 天猪 <<atian25@qq.com>>)
+
 0.12.0 / 2021-06-10
 ==================
 
