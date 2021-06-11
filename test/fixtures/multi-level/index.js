@@ -13,12 +13,4 @@ module.exports = class TestBoilerplate extends BaseBoilerplate {
     files['github.png'] = undefined;
     return files;
   }
-
-  async npmInstall() {
-    // do nth
-  }
-
-  async runTest() {
-    // do nth
-  }
 };

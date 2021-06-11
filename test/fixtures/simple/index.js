@@ -8,9 +8,8 @@ class TestBoilerplate extends BaseBoilerplate {
     return __dirname;
   }
 
-  async initQuestions() {
-    return [
-      ...await super.initQuestions(),
+  async askQuestions() {
+    const answers = await this.prompt([
       {
         name: 'name',
         type: 'input',
@@ -29,7 +28,9 @@ class TestBoilerplate extends BaseBoilerplate {
         message: 'Choose your type:',
         choices: [ 'simple', 'plugin', 'framework' ],
       },
-    ];
+    ]);
+
+    this.setLocals(answers);
   }
 }
 

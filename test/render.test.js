@@ -19,7 +19,7 @@ describe('test/render.test.js', () => {
 
   it('should work', async () => {
     await coffee.fork(path.join(fixtures, 'render/bin/cli.js'), [ '--test=123', '--a.c=789' ], { cwd: tmpDir })
-      // .debug()
+      .debug()
       .waitForPrompt()
       .writeKey('example\n')
       .writeKey('this is a desc\n')

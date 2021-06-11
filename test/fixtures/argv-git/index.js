@@ -9,15 +9,6 @@ module.exports = class TestBoilerplate extends BaseBoilerplate {
   }
 
   async askQuestions() {
-    await super.askQuestions();
     this.locals.localInfo = JSON.stringify(this.locals, null, 2);
-  }
-
-  async installDeps() {
-    // skip
-  }
-
-  async runTest() {
-    // skip
   }
 };

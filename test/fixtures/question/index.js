@@ -8,15 +8,22 @@ class TestBoilerplate extends BaseBoilerplate {
     return __dirname;
   }
 
-  async initQuestions() {
-    return [
-      ...await super.initQuestions(),
-      this.getBuiltinQuestions('scope'),
-      this.getBuiltinQuestions('name'),
-      this.getBuiltinQuestions('repository'),
-      this.getBuiltinQuestions('description', { default: 'desc' }),
-      this.getBuiltinQuestions('npm_module'),
-    ];
+  async askQuestions() {
+    const prefix = this.locals.prefix || '';
+    await this.askNpm({ prefix });
+
+    const { name, scope, npm } = this.locals;
+    const usage = `${npm} init ${scope}/${name.substring(prefix.length)}`;
+    this.setLocals({ usage });
+
+    this.setLocals(await this.prompt({
+      name: 'npm_module',
+      type: 'confirm',
+      message: 'Is this a npm module for reuse?',
+      default: true,
+    }));
+
+    await this.askGit();
   }
 }
 

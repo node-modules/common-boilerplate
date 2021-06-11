@@ -8,9 +8,8 @@ module.exports = class TestBoilerplate extends BaseBoilerplate {
     return __dirname;
   }
 
-  async initQuestions() {
-    return [
-      ...await super.initQuestions(),
+  async askQuestions() {
+    const answers = await this.prompt([
       {
         name: 'name',
         type: 'input',
@@ -21,19 +20,9 @@ module.exports = class TestBoilerplate extends BaseBoilerplate {
         type: 'input',
         message: 'Description:',
       },
-    ];
-  }
+    ], this.locals);
 
-  async askQuestions() {
-    await super.askQuestions();
+    this.setLocals(answers);
     this.locals.localInfo = JSON.stringify(this.locals, null, 2);
-  }
-
-  async installDeps() {
-    // skip
-  }
-
-  async runTest() {
-    // skip
   }
 };

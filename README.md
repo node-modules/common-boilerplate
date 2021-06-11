@@ -2,6 +2,13 @@
 
 base class for boilerplate
 
+[![NPM version](https://img.shields.io/npm/v/common-boilerplate.svg?style=flat-square)](https://npmjs.org/package/common-boilerplate)
+[![NPM quality](http://npm.packagequality.com/shield/common-boilerplate.svg?style=flat-square)](http://packagequality.com/#?package=common-boilerplate)
+[![NPM download](https://img.shields.io/npm/dm/common-boilerplate.svg?style=flat-square)](https://npmjs.org/package/common-boilerplate)
+
+[![Continuous Integration](https://github.com/node-modules/common-boilerplate/actions/workflows/nodejs.yml/badge.svg)](https://github.com/node-modules/common-boilerplate/actions/workflows/nodejs.yml)
+[![Test coverage](https://img.shields.io/codecov/c/github/node-modules/common-boilerplate.svg?style=flat-square)](https://codecov.io/gh/node-modules/common-boilerplate)
+
 [![NPM version][npm-image]][npm-url]
 [![build status][travis-image]][travis-url]
 [![Test coverage][codecov-image]][codecov-url]
@@ -9,31 +16,12 @@ base class for boilerplate
 [![Known Vulnerabilities][snyk-image]][snyk-url]
 [![NPM download][download-image]][download-url]
 
-[npm-image]: https://img.shields.io/npm/v/common-boilerplate.svg?style=flat-square
-[npm-url]: https://npmjs.org/package/common-boilerplate
-[travis-image]: https://img.shields.io/travis/node-modules/common-boilerplate.svg?style=flat-square
-[travis-url]: https://travis-ci.org/node-modules/common-boilerplate
-[codecov-image]: https://codecov.io/gh/node-modules/common-boilerplate/branch/master/graph/badge.svg
-[codecov-url]: https://codecov.io/gh/node-modules/common-boilerplate
-[david-image]: https://img.shields.io/david/node-modules/common-boilerplate.svg?style=flat-square
-[david-url]: https://david-dm.org/node-modules/common-boilerplate
-[snyk-image]: https://snyk.io/test/npm/common-boilerplate/badge.svg?style=flat-square
-[snyk-url]: https://snyk.io/test/npm/common-boilerplate
-[download-image]: https://img.shields.io/npm/dm/common-boilerplate.svg?style=flat-square
-[download-url]: https://npmjs.org/package/common-boilerplate
-
-## Usage
-
-```bash
-$ npm i common-boilerplate --save
-```
-
 ## Write your boilerplate
 
-use [boilerplate-boilerplate](https://github.com/node-modules/boilerplate-boilerplate) for quick start.
+use [create-common-boilerplate](https://github.com/node-modules/create-common-boilerplate) for quick start.
 
 ```bash
-$ npm init @nodemodules/boilerplate
+$ npm init common-boilerplate
 ```
 
 ### Lifecycle
@@ -89,8 +77,8 @@ Add your questions:
 
 ```js
 class MainBoilerplate extends Boilerplate {
-  async initQuestions() {
-    const questions = [
+  async askQuestions() {
+    const answers = await this.prompt([
       {
         name: 'name',
         type: 'input',
@@ -103,14 +91,19 @@ class MainBoilerplate extends Boilerplate {
         message: 'choose your type:',
         choices: [ 'simple', 'plugin', 'framework' ],
       },
-      // use built-in questions
-      this.getBuiltinQuestions('repository', {}, {}),
-    ];
-    return questions;
+    ]);
+    this.setLocals(answers);
+
+    // use built-in questions
+    await this.askGit();
   }
-  // ...
 };
 ```
+
+**Built-in Questions:**
+
+- `askNpm()`: ask for `name` / `scope` / `description`, and `pkgName` getter.
+- `askGit()`: ask for `repository`
 
 ### Locals
 
@@ -187,7 +180,6 @@ Use `this.requestOpts` as default request options.
 
 Also support custom argv:
 
-- if pass the same name with question, then skip asking user and write it to `locals`
 - `argv` will convert to camelCase, such as `--page-size=1 -> pageSize`
 - dot prop will convert to nested object, such as `--page.size=1 -> { page: { size: '1' } }`
 - see [yargs#optionskey](https://github.com/yargs/yargs/blob/master/docs/api.md#optionskey-opt) for more details
