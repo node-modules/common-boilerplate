@@ -26,7 +26,7 @@ describe('test/argv.test.js', () => {
 
     assertFile(`${tmpDir}/README.md`, `baseDir = ${tmpDir}`);
     assertFile(`${tmpDir}/README.md`, 'name = argv');
-    // will use thr first write() due to `name` is consumed by argv
+    // will use the first write() due to `name` is consumed by argv
     assertFile(`${tmpDir}/README.md`, 'description = this is a desc');
     assertFile(`${tmpDir}/README.md`, 'test = 123');
     assertFile(`${tmpDir}/README.md`, 'nested = 456');
