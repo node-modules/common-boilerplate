@@ -1,0 +1,9 @@
+{
+  "name": "{{ pkgName }}",
+  "version": "1.0.0",
+  "description": "{{ description }}",
+  "author": "{{ user.author }}",
+  "homepage": "{{ homepage }}",
+  "repository": "{{ gitInfo.href }}",
+  "npm_module": "{{ npm_module }}"
+}
