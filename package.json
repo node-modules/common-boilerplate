@@ -1,6 +1,6 @@
 {
   "name": "common-boilerplate",
-  "version": "0.14.0",
+  "version": "0.15.0",
   "description": "base class for boilerplate",
   "main": "./lib/base",
   "exports": "./lib/base",
