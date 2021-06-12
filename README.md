@@ -9,13 +9,6 @@ base class for boilerplate
 [![Continuous Integration](https://github.com/node-modules/common-boilerplate/actions/workflows/nodejs.yml/badge.svg)](https://github.com/node-modules/common-boilerplate/actions/workflows/nodejs.yml)
 [![Test coverage](https://img.shields.io/codecov/c/github/node-modules/common-boilerplate.svg?style=flat-square)](https://codecov.io/gh/node-modules/common-boilerplate)
 
-[![NPM version][npm-image]][npm-url]
-[![build status][travis-image]][travis-url]
-[![Test coverage][codecov-image]][codecov-url]
-[![David deps][david-image]][david-url]
-[![Known Vulnerabilities][snyk-image]][snyk-url]
-[![NPM download][download-image]][download-url]
-
 ## Write your boilerplate
 
 use [create-common-boilerplate](https://github.com/node-modules/create-common-boilerplate) for quick start.
@@ -30,11 +23,15 @@ $ npm init common-boilerplate
 - ask question
 - list all file from boilerplate paths
 - render files to target dir
+- do post jobs
 ```
 
 ### Directory
 
 ```bash
+├── bin
+│   └── cli.js
+│
 ├── boilerplate
 │   ├── lib
 │   ├── test
@@ -43,6 +40,7 @@ $ npm init common-boilerplate
 │   ├── _.gitignore
 │   ├── _package.json
 │   └── index.js
+│
 ├── test
 │   └── index.test.js
 ├── index.js
@@ -107,7 +105,7 @@ class MainBoilerplate extends Boilerplate {
 
 ### Locals
 
-`this.locals` is used to fill the teamplte, it's merge from `built-in -> argv -> user's prompt answer`;
+`this.locals` is used to fill the template, it's merge from `built-in -> argv -> user's prompt answer`;
 
 **Built-in:**
 
@@ -175,6 +173,21 @@ await this.request(url, opts);
 ```
 
 Use `this.requestOpts` as default request options.
+
+
+### RunScript
+
+Provide runscript for developer, see [runscript](https://github.com/node-modules/runscript) for more details.
+
+`cwd` is set to target dir, and will use `this.local.npm` as cli.
+
+```js
+await this.runScript('ci', { grep: 'home.test.js' }, {});
+
+await this.installDeps({ optional : false });
+
+await this.runTest({});
+```
 
 ### CommandLine argv
 
